@@ -8,16 +8,7 @@ import anime from 'animejs';
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
-    anime.timeline({
-        targets: ".maindiv",
-        easing: "easeInOutCubic",
-        duration: 5000,
-        loop: true,
-        direction: "alternate",
-        autoplay: true,
-    }).add({
-        background: "linear-gradient(to bottom right, rgb(18, 18, 18), rgb(0, 0, 0))",
-    })
+
     return (
         <div className="maindiv bg-black min-h-screen">
             <nav className="bg-gray-800 border-b border-gray-100">

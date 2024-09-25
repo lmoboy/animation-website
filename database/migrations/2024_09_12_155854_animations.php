@@ -11,7 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('animations', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->longText('description');
+            $table->json('params');
+            $table->unsignedInteger('owner_id');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('animations');
     }
 };

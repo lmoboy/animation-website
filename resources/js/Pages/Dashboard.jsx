@@ -16,10 +16,10 @@ export default function Dashboard({ auth }) {
 
             <div className="p-2 w-full h-screen">
                 <div className="p-10 w-full h-full grid grid-cols-2 gap-10">
-                    <div className="px-4 py-2 bg-green-500 rounded-md cursor-pointer">
+                    <div onClick={() => route('animation.create')} className="px-4 py-2 bg-green-500 rounded-md cursor-pointer">
                         Create an animation
                     </div>
-                    <div className="px-4 py-2 bg-red-500 rounded-md cursor-pointer">
+                    <div onClick={() => route('Featured')} className="px-4 py-2 bg-red-500 rounded-md cursor-pointer">
                         Explore
                     </div>
                     <div className="px-4 py-2 bg-blue-500 rounded-md cursor-pointer">

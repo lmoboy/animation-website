@@ -10,6 +10,13 @@ use Illuminate\Http\Request;
 class AnimationsController extends Controller
 {
     
+    public function featured()
+    {
+        
+        return Animations::orderBy('id', 'asc')->take(10)->get();
+        
+    }
+
     public function index()
     {
         return Animations::all();

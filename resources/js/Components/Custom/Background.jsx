@@ -23,7 +23,7 @@ export default function Background() {
     },[])
 
     return (
-        <div className="mainCubes fixed inset-0 -z-1  bg-opacity-75">
+        <div className="mainCubes fixed inset-0  bg-opacity-75">
             {Array.from({ length: 10 }).map((_, i) => {
                 const size = Math.floor(Math.random() * 100) + 3;
                 const x = Math.floor(Math.random() * 100);

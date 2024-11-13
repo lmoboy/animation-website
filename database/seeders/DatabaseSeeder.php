@@ -6,8 +6,8 @@ namespace Database\Seeders;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\animations;
-use App\Models\AnimationParameters;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -23,7 +23,6 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
         User::factory(10)->create();
-        AnimationParameters::factory(10)->create();
         animations::factory(10)->create();
     }
 }

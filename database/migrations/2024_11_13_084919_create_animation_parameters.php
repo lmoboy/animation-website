@@ -4,9 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-use App\Models\AnimationParameters;
-
-
 return new class extends Migration
 {
     /**
@@ -14,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('animations', function (Blueprint $table) {
+        Schema::create('animation_parameters', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->longText('description');
-            $table->foreignIdFor(AnimationParameters::class,'param_ref');
-            $table->unsignedInteger('owner_id');
+            $table->string('direction');
+            $table->integer('duration');
+            $table->integer('translateX');
+            $table->integer('translateY');
+            $table->string('easing');
+            $table->boolean('loop');
+            $table->boolean('rotate');
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('animations');
+        Schema::dropIfExists('animation_parameters');
     }
 };

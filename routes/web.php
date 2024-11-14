@@ -28,8 +28,22 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Animation Routes
+    Route::get('/animation/create', function () {
+        return Inertia::render('Animation/Create');
+    })->name('animation.create');
 
+    Route::get('/animation/search', function () {
+        return Inertia::render('Animation/Search');
+    })->name('animation.search');
 
+    Route::get('/animation/explore', function () {
+        return Inertia::render('Animation/Explore');
+    })->name('animation.explore');
+
+    Route::get('/about', function () {
+        return Inertia::render('About');
+    })->name('about');
 
     Route::get('/api/featured' , [AnimationsController::class, 'featured'])->name('featured');
 

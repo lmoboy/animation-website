@@ -1,22 +1,20 @@
-import ApplicationLogo from "@/Components/ApplicationLogo";
-import Waves from "@/Components/Custom/Waves";
-import { Link } from "@inertiajs/react";
+import ApplicationLogo from '@/Components/ApplicationLogo';
+import { Link } from '@inertiajs/react';
 
 export default function Guest({ children }) {
     return (
         <>
-            <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-800">
-                <div>
+            <div className="min-h-screen flex flex-col items-center justify-center">
+                <div className="absolute top-6 z-20">
                     <Link href="/">
-                        <ApplicationLogo className="w-20 h-20 text-gray-500" />
+                        <ApplicationLogo className="w-20 h-20 fill-current text-purple-400" />
                     </Link>
                 </div>
 
-                <div className="w-full z-10  sm:max-w-md mt-6 px-6 py-4 overflow-hidden sm:rounded-lg">
+                <div className="relative w-full sm:max-w-md px-6">
                     {children}
                 </div>
             </div>
-            <Waves />
         </>
     );
 }

@@ -6,25 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('animations', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->longText('description');
-            $table->json('params');
-            $table->unsignedInteger('owner_id');
+            $table->increments('id');
+            $table->foreignId('parameter_id')->constrained('animation_parameters')->onDelete('cascade');
+            $table->text('user_id');
+            $table->integer('views')->default(0);
+            $table->boolean('featured')->default(false);
+            $table->integer('duration')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('animations');
     }

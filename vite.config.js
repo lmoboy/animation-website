@@ -7,6 +7,7 @@ export default defineConfig({
         laravel({
             input: 'resources/js/app.jsx',
             refresh: true,
+            publicDirectory: 'public',
         }),
         react(),
     ],
@@ -27,5 +28,8 @@ export default defineConfig({
                 }
             }
         }
+    },
+    optimizeDeps: {
+        include: ['@inertiajs/react']
     }
 });

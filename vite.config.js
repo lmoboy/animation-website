@@ -11,12 +11,21 @@ export default defineConfig({
         react(),
     ],
     server: {
-        host: '0.0.0.0',
+        host: process.env.VITE_HOST || 'localhost',
         hmr: {
-            host: '10.13.44.87'
-        },
-        watch: {
-            usePolling: true,
-        },
+            host: process.env.VITE_HMR_HOST || 'localhost'
+        }
     },
+    build: {
+        chunkSizeWarningLimit: 1000,
+        manifest: true,
+        outDir: 'public/build',
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom', '@inertiajs/react']
+                }
+            }
+        }
+    }
 });

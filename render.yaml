@@ -4,34 +4,49 @@ services:
     env: docker
     buildCommand: |
       composer install --no-dev --optimize-autoloader
-      php artisan config:cache
-      php artisan route:cache
-      php artisan view:cache
+      touch database/database.sqlite
+      php artisan migrate --force
       npm ci
       npm run build
       php artisan storage:link
-    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    startCommand: |
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+      php artisan serve --host 0.0.0.0 --port $PORT
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: false
+        value: true
       - key: APP_KEY
         generateValue: true
       - key: APP_URL
         fromService:
           name: animations
           type: web
-          property: host
+          property: url
       - key: DB_CONNECTION
         value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/html/database/database.sqlite
       - key: ASSET_URL
         fromService:
           name: animations
           type: web
-          property: host
+          property: url
       - key: VITE_APP_URL
         fromService:
           name: animations
           type: web
-          property: host
+          property: url
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: debug
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync

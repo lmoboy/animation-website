@@ -4,13 +4,11 @@ import { useEffect } from "react";
 import anime from "animejs";
 
 export default function Dashboard({ auth }) {
-
-
     return (
         <AuthenticatedLayout
             user={auth.user}
             header={
-                <h2 className="font-semibold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                <h2 className="font-semibold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-purple-300">
                     Dashboard
                 </h2>
             }
@@ -23,13 +21,13 @@ export default function Dashboard({ auth }) {
                         {/* Create Animation Card */}
                         <Link
                             href={route("animation.create")}
-                            className="dashboard-card group cursor-pointer bg-white/10 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300"
+                            className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
                         >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
+                                    <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg">
                                         <svg
-                                            className="h-6 w-6 text-white"
+                                            className="h-6 w-6 text-purple-300"
                                             fill="none"
                                             viewBox="0 0 24 24"
                                             stroke="currentColor"
@@ -42,7 +40,7 @@ export default function Dashboard({ auth }) {
                                             />
                                         </svg>
                                     </div>
-                                    <h3 className="ml-4 text-xl font-semibold text-white group-hover:text-purple-400 transition-colors">
+                                    <h3 className="ml-4 text-xl font-semibold text-gray-200 group-hover:text-purple-300 transition-colors">
                                         Create Animation
                                     </h3>
                                 </div>
@@ -53,16 +51,16 @@ export default function Dashboard({ auth }) {
                             </div>
                         </Link>
 
-                        {/* Explore Card */}
+                        {/* Browse Animations Card */}
                         <Link
                             href={route("animation.explore")}
-                            className="dashboard-card group cursor-pointer bg-white/10 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300"
+                            className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
                         >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
+                                    <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg">
                                         <svg
-                                            className="h-6 w-6 text-white"
+                                            className="h-6 w-6 text-purple-300"
                                             fill="none"
                                             viewBox="0 0 24 24"
                                             stroke="currentColor"
@@ -71,12 +69,12 @@ export default function Dashboard({ auth }) {
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
                                                 strokeWidth="2"
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                d="M4 6h16M4 10h16M4 14h16M4 18h16"
                                             />
                                         </svg>
                                     </div>
-                                    <h3 className="ml-4 text-xl font-semibold text-white group-hover:text-purple-400 transition-colors">
-                                        Explore
+                                    <h3 className="ml-4 text-xl font-semibold text-gray-200 group-hover:text-purple-300 transition-colors">
+                                        Browse Animations
                                     </h3>
                                 </div>
                                 <p className="mt-4 text-gray-400">
@@ -86,16 +84,16 @@ export default function Dashboard({ auth }) {
                             </div>
                         </Link>
 
-                        {/* Search Card */}
+                        {/* Community Card */}
                         <Link
                             href={route("animation.search")}
-                            className="dashboard-card group cursor-pointer bg-white/10 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300"
+                            className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
                         >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
+                                    <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg">
                                         <svg
-                                            className="h-6 w-6 text-white"
+                                            className="h-6 w-6 text-purple-300"
                                             fill="none"
                                             viewBox="0 0 24 24"
                                             stroke="currentColor"
@@ -104,12 +102,12 @@ export default function Dashboard({ auth }) {
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
                                                 strokeWidth="2"
-                                                d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
+                                                d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
                                             />
                                         </svg>
                                     </div>
-                                    <h3 className="ml-4 text-xl font-semibold text-white group-hover:text-purple-400 transition-colors">
-                                        Search
+                                    <h3 className="ml-4 text-xl font-semibold text-gray-200 group-hover:text-purple-300 transition-colors">
+                                        Community Forum
                                     </h3>
                                 </div>
                                 <p className="mt-4 text-gray-400">
@@ -119,16 +117,16 @@ export default function Dashboard({ auth }) {
                             </div>
                         </Link>
 
-                        {/* About Us Card */}
+                        {/* Profile Card */}
                         <Link
                             href={route("about")}
-                            className="dashboard-card group cursor-pointer bg-white/10 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden hover:bg-white/20 transition-all duration-300"
+                            className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
                         >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
+                                    <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg">
                                         <svg
-                                            className="h-6 w-6 text-white"
+                                            className="h-6 w-6 text-purple-300"
                                             fill="none"
                                             viewBox="0 0 24 24"
                                             stroke="currentColor"

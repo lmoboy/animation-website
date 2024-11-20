@@ -13,24 +13,24 @@ export default function Authenticated({ user, header, children }) {
             {/* Background Elements */}
             <div className="fixed inset-0 z-0">
                 {/* Gradient Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-black to-pink-900"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
                 
                 {/* Animated Orbs */}
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-xl opacity-20"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-screen filter blur-xl opacity-20"></div>
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-screen filter blur-xl opacity-20"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-screen filter blur-xl opacity-20"></div>
                 
                 {/* Grid Pattern */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:32px_32px]"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:32px_32px]"></div>
             </div>
 
             {/* Navigation */}
-            <nav className="fixed w-full bg-white/10 backdrop-blur-md border-b border-white/20 z-50">
+            <nav className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
                                 <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-white" />
+                                    <ApplicationLogo className="block h-9 w-auto fill-current text-purple-300" />
                                 </Link>
                             </div>
 
@@ -38,7 +38,9 @@ export default function Authenticated({ user, header, children }) {
                                 <NavLink
                                     href={route("dashboard")}
                                     active={route().current("dashboard")}
-                                    className="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-200 transition duration-150 ease-in-out focus:outline-none"
+                                    className={`inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none ${
+                                        route().current("dashboard") ? "text-purple-300" : "text-gray-400 hover:text-gray-200"
+                                    }`}
                                 >
                                     Dashboard
                                 </NavLink>
@@ -52,7 +54,7 @@ export default function Authenticated({ user, header, children }) {
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center px-3 py-2 border border-white/20 text-sm leading-4 font-medium rounded-md text-gray-200 bg-white/10 hover:bg-white/20 focus:outline-none transition ease-in-out duration-150"
+                                                className="inline-flex items-center px-3 py-2 border border-gray-700 text-sm leading-4 font-medium rounded-md text-gray-300 bg-gray-800/50 hover:bg-gray-800 focus:outline-none transition ease-in-out duration-150"
                                             >
                                                 {user.name}
 
@@ -73,8 +75,18 @@ export default function Authenticated({ user, header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link href={route("profile.edit")}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route("logout")} method="post" as="button">
+                                        <Dropdown.Link 
+                                            href={route("profile.edit")}
+                                            className="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-300 hover:bg-gray-800 focus:outline-none focus:bg-gray-800 transition duration-150 ease-in-out"
+                                        >
+                                            Profile
+                                        </Dropdown.Link>
+                                        <Dropdown.Link 
+                                            href={route("logout")} 
+                                            method="post" 
+                                            as="button"
+                                            className="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-300 hover:bg-gray-800 focus:outline-none focus:bg-gray-800 transition duration-150 ease-in-out"
+                                        >
                                             Log Out
                                         </Dropdown.Link>
                                     </Dropdown.Content>
@@ -85,7 +97,7 @@ export default function Authenticated({ user, header, children }) {
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
                                 onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
-                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-gray-500 hover:bg-white/10 focus:outline-none focus:bg-white/20 focus:text-gray-200 transition duration-150 ease-in-out"
+                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 focus:outline-none focus:bg-gray-800 focus:text-gray-200 transition duration-150 ease-in-out"
                             >
                                 <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                     <path
@@ -113,21 +125,34 @@ export default function Authenticated({ user, header, children }) {
                         <ResponsiveNavLink
                             href={route("dashboard")}
                             active={route().current("dashboard")}
-                            className="text-gray-200"
+                            className={`block w-full pl-3 pr-4 py-2 border-l-4 text-left text-base font-medium focus:outline-none transition duration-150 ease-in-out ${
+                                route().current("dashboard")
+                                    ? "border-purple-400 text-purple-300 bg-gray-800/50"
+                                    : "border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800 hover:border-gray-700"
+                            }`}
                         >
                             Dashboard
                         </ResponsiveNavLink>
                     </div>
 
-                    <div className="pt-4 pb-1 border-t border-white/20">
+                    <div className="pt-4 pb-1 border-t border-gray-800">
                         <div className="px-4">
                             <div className="font-medium text-base text-gray-200">{user.name}</div>
                             <div className="font-medium text-sm text-gray-400">{user.email}</div>
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route("profile.edit")} className="text-gray-200">Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route("logout")} as="button" className="text-gray-200">
+                            <ResponsiveNavLink
+                                href={route("profile.edit")}
+                                className="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-800 hover:border-gray-700 focus:outline-none transition duration-150 ease-in-out"
+                            >
+                                Profile
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                method="post"
+                                href={route("logout")}
+                                className="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-800 hover:border-gray-700 focus:outline-none transition duration-150 ease-in-out"
+                            >
                                 Log Out
                             </ResponsiveNavLink>
                         </div>
@@ -135,17 +160,15 @@ export default function Authenticated({ user, header, children }) {
                 </div>
             </nav>
 
-            {/* Page Content */}
-            <main className="relative z-10 pt-16">
-                {header && (
-                    <header className="bg-white/5 backdrop-blur-md shadow border-b border-white/10">
-                        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                            {header}
-                        </div>
-                    </header>
-                )}
-                {children}
-            </main>
+            {/* Header */}
+            {header && (
+                <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 shadow">
+                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
+                </header>
+            )}
+
+            {/* Main Content */}
+            <main className="relative z-10">{children}</main>
         </div>
     );
 }

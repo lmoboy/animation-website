@@ -43,17 +43,6 @@ export default function Welcome({ auth }) {
     const ctaRef = useRef(null);
     const heroRef = useRef(null);
 
-    // Mouse position handler
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            const threshold = 100; // Show nav when mouse is within 100px of top
-            setShowNav(e.clientY <= threshold);
-        };
-
-        window.addEventListener("mousemove", handleMouseMove);
-        return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, []);
-
     useEffect(() => {
         if (auth.user) setComplete(true);
 
@@ -71,22 +60,11 @@ export default function Welcome({ auth }) {
     }, []);
 
     useEffect(() => {
-        anime({
-            targets: ".header",
-            easing: "easeInQuad",
-            translateY: showNav ? 0 : -100,
-            opacity: showNav ? 1 : 0,
-            duration: 300,
-        });
-    }, [showNav]);
-
-    useEffect(() => {
         if (!complete) return;
 
         anime({
             targets: ".header",
             easing: "easeOutExpo",
-            translateY: [-100, 0],
             opacity: [0, 1],
             duration: 1200,
             delay: 200,
@@ -166,7 +144,7 @@ export default function Welcome({ auth }) {
                         {/* Background Pattern */}
                         <div className="fixed inset-0 z-[1]">
                             {/* Gradient Background */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-black to-pink-900 animate-gradient"></div>
+                            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 animate-gradient"></div>
 
                             {/* Animated Orbs */}
                             <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-xl opacity-50 animate-float"></div>
@@ -184,17 +162,13 @@ export default function Welcome({ auth }) {
                         {/* Content */}
                         <div className="relative z-[2]">
                             <header
-                                className={`header opacity-0 top-0 flex justify-end gap-2 py-10 bg-gradient-to-r from-purple-900/40 to-pink-900/40 backdrop-blur-md fixed w-full z-50 transition-transform duration-300 ${
-                                    showNav
-                                        ? "translate-y-0"
-                                        : "-translate-y-full"
-                                }`}
+                                className={`header opacity-0 top-0 flex justify-end gap-2 py-10 bg-gradient-to-r w-full z-50 transition-transform duration-300`}
                             >
-                                <nav className="flex flex-1 justify-center space-x-4">
+                                <nav className="flex flex-1 justify-end px-10 space-x-4">
                                     {auth.user ? (
                                         <Link
                                             href={route("dashboard")}
-                                            className="rounded-lg px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold transform hover:scale-105 transition-all duration-300 hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black"
+                                            className="rounded-lg px-6 py-2.5 bg-gradient-to-r from-gray-800 to-gray-900 text-purple-300 font-semibold transform hover:scale-105 transition-all duration-300 hover:from-gray-900 hover:to-black focus:outline-none focus:ring-2 focus:ring-purple-900 focus:ring-offset-2 focus:ring-offset-black"
                                         >
                                             Dashboard
                                         </Link>
@@ -202,13 +176,13 @@ export default function Welcome({ auth }) {
                                         <>
                                             <Link
                                                 href={route("login")}
-                                                className="rounded-lg px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold transform hover:scale-105 transition-all duration-300 hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black"
+                                                className="rounded-lg px-6 py-2.5 text-purple-300 font-semibold transform hover:scale-105 transition-all duration-300 hover:text-purple-400 focus:outline-none"
                                             >
                                                 Log in
                                             </Link>
                                             <Link
                                                 href={route("register")}
-                                                className="rounded-lg px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold transform hover:scale-105 transition-all duration-300 hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-black"
+                                                className="rounded-lg px-6 py-2.5 bg-gradient-to-r from-gray-800 to-gray-900 text-purple-300 font-semibold transform hover:scale-105 transition-all duration-300 hover:from-gray-900 hover:to-black focus:outline-none focus:ring-2 focus:ring-purple-900 focus:ring-offset-2 focus:ring-offset-black"
                                             >
                                                 Register
                                             </Link>
@@ -218,67 +192,73 @@ export default function Welcome({ auth }) {
                             </header>
 
                             {/* Hero Section */}
-                            <section className="pt-32 pb-16 px-4">
-                                <div ref={heroRef} className="opacity-0">
-                                    <CardContainer
-                                        className="max-w-4xl mx-auto p-8
-                                        border border-white/10 bg-gradient-to-br from-white/10 to-white/5
-                                        rounded-xl hover:scale-105 hover:from-white/15 hover:to-white/10 
-                                        transition-all duration-500 backdrop-blur-md shadow-2xl"
-                                    >
-                                        <main className="text-center text-white">
-                                            <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
-                                                Welcome to the BEST Animation
-                                                Platform
-                                            </h2>
-                                            <div className="text-xl text-gray-300 mt-4">
-                                                Create, share, and explore
-                                                stunning animations with our
-                                                intuitive tools
-                                            </div>
-                                        </main>
-                                    </CardContainer>
+                            <section className="min-h-screen relative flex items-center justify-center py-20 px-4">
+                                <div
+                                    ref={heroRef}
+                                    className="max-w-6xl mx-auto text-center relative opacity-0"
+                                >
+                                    <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-200 to-purple-300 text-transparent bg-clip-text">
+                                        Create Stunning Animations
+                                    </h1>
+                                    <p className="text-gray-400 text-xl mb-8 max-w-2xl mx-auto">
+                                        Bring your ideas to life with our
+                                        powerful animation tools
+                                    </p>
+                                    <div className="flex justify-center gap-4">
+                                        <Link
+                                            href={route("register")}
+                                            className="rounded-lg px-8 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-purple-300 font-semibold transform hover:scale-105 transition-all duration-300 hover:from-gray-900 hover:to-black"
+                                        >
+                                            Get Started
+                                        </Link>
+                                        <Link
+                                            href="#about"
+                                            className="rounded-lg px-8 py-3 bg-gray-900/50 text-purple-300 font-semibold transform hover:scale-105 transition-all duration-300"
+                                        >
+                                            Learn More
+                                        </Link>
+                                    </div>
                                 </div>
                             </section>
 
-                            {/* About Us Section */}
+                            {/* About Section */}
                             <section
+                                id="about"
+                                className="py-20 px-4 relative"
                                 ref={aboutRef}
-                                className="py-16 px-4 bg-gradient-to-r from-purple-900/10 to-pink-900/10 relative"
                             >
-                                <div className="absolute inset-0 backdrop-blur-md"></div>
                                 <div className="max-w-6xl mx-auto relative">
-                                    <h3 className="section-title text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text opacity-0">
+                                    <h3 className="section-title text-3xl font-bold mb-8 text-center bg-gradient-to-r from-gray-200 to-purple-300 text-transparent bg-clip-text opacity-0">
                                         About Us
                                     </h3>
                                     <div className="grid md:grid-cols-3 gap-8">
-                                        <div className="about-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                            <h4 className="text-xl font-semibold mb-4 text-purple-400">
+                                        <div className="about-card hover:from-gray-800 hover:to-gray-900 bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                            <h4 className="text-xl font-semibold mb-4 text-purple-300">
                                                 Our Mission
                                             </h4>
-                                            <p className="text-gray-300">
+                                            <p className="text-gray-400">
                                                 To empower creators with
                                                 powerful yet simple animation
                                                 tools, making animation
                                                 accessible to everyone.
                                             </p>
                                         </div>
-                                        <div className="about-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                            <h4 className="text-xl font-semibold mb-4 text-pink-400">
+                                        <div className="about-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                            <h4 className="text-xl font-semibold mb-4 text-purple-300">
                                                 Our Vision
                                             </h4>
-                                            <p className="text-gray-300">
+                                            <p className="text-gray-400">
                                                 Building a vibrant community
                                                 where creativity knows no bounds
                                                 and animations bring ideas to
                                                 life.
                                             </p>
                                         </div>
-                                        <div className="about-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                            <h4 className="text-xl font-semibold mb-4 text-purple-400">
+                                        <div className="about-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                            <h4 className="text-xl font-semibold mb-4 text-purple-300">
                                                 Our Values
                                             </h4>
-                                            <p className="text-gray-300">
+                                            <p className="text-gray-400">
                                                 Innovation, creativity, and
                                                 community-driven development are
                                                 at the heart of everything we
@@ -292,43 +272,43 @@ export default function Welcome({ auth }) {
                             {/* Technologies Section */}
                             <section
                                 ref={techRef}
-                                className="py-16 px-4 relative"
+                                className="py-20 px-4 relative"
                             >
                                 <div className="absolute inset-0"></div>
                                 <div className="max-w-6xl mx-auto relative">
-                                    <h3 className="section-title text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text opacity-0">
+                                    <h3 className="section-title text-3xl font-bold mb-8 text-center bg-gradient-to-r from-gray-200 to-purple-300 text-transparent bg-clip-text opacity-0">
                                         Technologies We Use
                                     </h3>
                                     <div className="grid md:grid-cols-4 gap-6 text-center">
-                                        <div className="tech-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                            <h4 className="text-xl font-semibold text-purple-400 mb-2">
+                                        <div className="tech-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                            <h4 className="text-xl font-semibold text-purple-300 mb-2">
                                                 React
                                             </h4>
-                                            <p className="text-gray-300">
+                                            <p className="text-gray-400">
                                                 Modern UI development
                                             </p>
                                         </div>
-                                        <div className="tech-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                            <h4 className="text-xl font-semibold text-pink-400 mb-2">
+                                        <div className="tech-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                            <h4 className="text-xl font-semibold text-purple-300 mb-2">
                                                 Laravel
                                             </h4>
-                                            <p className="text-gray-300">
+                                            <p className="text-gray-400">
                                                 Robust backend framework
                                             </p>
                                         </div>
-                                        <div className="tech-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                            <h4 className="text-xl font-semibold text-purple-400 mb-2">
+                                        <div className="tech-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                            <h4 className="text-xl font-semibold text-purple-300 mb-2">
                                                 Anime.js
                                             </h4>
-                                            <p className="text-gray-300">
+                                            <p className="text-gray-400">
                                                 Powerful animations
                                             </p>
                                         </div>
-                                        <div className="tech-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                            <h4 className="text-xl font-semibold text-pink-400 mb-2">
+                                        <div className="tech-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                            <h4 className="text-xl font-semibold text-purple-300 mb-2">
                                                 Tailwind CSS
                                             </h4>
-                                            <p className="text-gray-300">
+                                            <p className="text-gray-400">
                                                 Modern styling
                                             </p>
                                         </div>
@@ -339,30 +319,30 @@ export default function Welcome({ auth }) {
                             {/* Our Practices Section */}
                             <section
                                 ref={practicesRef}
-                                className="py-16 px-4 bg-gradient-to-r from-purple-900/10 to-pink-900/10 relative"
+                                className="py-20 px-4 bg-gradient-to-r from-gray-900/10 to-gray-900/10 relative"
                             >
                                 <div className="absolute inset-0 backdrop-blur-md"></div>
                                 <div className="max-w-6xl mx-auto relative">
-                                    <h3 className="section-title text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text opacity-0">
+                                    <h3 className="section-title text-3xl font-bold mb-8 text-center bg-gradient-to-r from-gray-200 to-purple-300 text-transparent bg-clip-text opacity-0">
                                         Our Best Practices
                                     </h3>
                                     <div className="grid md:grid-cols-2 gap-8">
                                         <div className="space-y-6">
-                                            <div className="practice-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                                <h4 className="text-xl font-semibold mb-3 text-purple-400">
+                                            <div className="practice-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                                <h4 className="text-xl font-semibold mb-3 text-purple-300">
                                                     Performance First
                                                 </h4>
-                                                <p className="text-gray-300">
+                                                <p className="text-gray-400">
                                                     Optimized animations and
                                                     efficient code execution for
                                                     smooth user experience
                                                 </p>
                                             </div>
-                                            <div className="practice-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                                <h4 className="text-xl font-semibold mb-3 text-pink-400">
+                                            <div className="practice-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                                <h4 className="text-xl font-semibold mb-3 text-purple-300">
                                                     User-Centric Design
                                                 </h4>
-                                                <p className="text-gray-300">
+                                                <p className="text-gray-400">
                                                     Intuitive interfaces and
                                                     workflows designed with
                                                     users in mind
@@ -370,21 +350,21 @@ export default function Welcome({ auth }) {
                                             </div>
                                         </div>
                                         <div className="space-y-6">
-                                            <div className="practice-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                                <h4 className="text-xl font-semibold mb-3 text-purple-400">
+                                            <div className="practice-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                                <h4 className="text-xl font-semibold mb-3 text-purple-300">
                                                     Community Driven
                                                 </h4>
-                                                <p className="text-gray-300">
+                                                <p className="text-gray-400">
                                                     Regular updates and features
                                                     based on community feedback
                                                     and needs
                                                 </p>
                                             </div>
-                                            <div className="practice-card bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-lg backdrop-blur-md border border-white/10 opacity-0 shadow-xl">
-                                                <h4 className="text-xl font-semibold mb-3 text-pink-400">
+                                            <div className="practice-card bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg backdrop-blur-md border border-gray-800 opacity-0 shadow-xl">
+                                                <h4 className="text-xl font-semibold mb-3 text-purple-300">
                                                     Security First
                                                 </h4>
-                                                <p className="text-gray-300">
+                                                <p className="text-gray-400">
                                                     Implementation of best
                                                     security practices to
                                                     protect user data and
@@ -397,23 +377,23 @@ export default function Welcome({ auth }) {
                             </section>
 
                             {/* Call to Action */}
-                            <section className="py-16 px-4 relative">
+                            <section className="py-20 px-4 relative">
                                 <div className="absolute inset-0"></div>
                                 <div
                                     ref={ctaRef}
                                     className="max-w-4xl mx-auto text-center relative opacity-0"
                                 >
-                                    <h3 className="text-3xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
+                                    <h3 className="text-3xl font-bold mb-6 bg-gradient-to-r from-gray-200 to-purple-300 text-transparent bg-clip-text">
                                         Ready to Start Creating?
                                     </h3>
-                                    <p className="text-gray-300 mb-8 text-lg">
+                                    <p className="text-gray-400 mb-8 text-lg">
                                         Join our community and start bringing
                                         your ideas to life with amazing
                                         animations!
                                     </p>
                                     <Link
                                         href={route("register")}
-                                        className="inline-block rounded-lg px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold transform hover:scale-105 transition-all duration-300 hover:from-purple-700 hover:to-pink-600"
+                                        className="inline-block rounded-lg px-8 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-purple-300 font-semibold transform hover:scale-105 transition-all duration-300 hover:from-gray-900 hover:to-black"
                                     >
                                         Get Started Now
                                     </Link>

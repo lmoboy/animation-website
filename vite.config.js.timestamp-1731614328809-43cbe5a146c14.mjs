@@ -10,15 +10,15 @@ var vite_config_default = defineConfig({
     }),
     react()
   ],
-  server: {
-    host: "0.0.0.0",
-    hmr: {
-      host: "10.13.44.87"
-    },
-    watch: {
-      usePolling: true
-    }
-  }
+  // server: {
+  //   host: "0.0.0.0",
+  //   hmr: {
+  //     host: "localhost"
+  //   },
+  //   watch: {
+  //     usePolling: true
+  //   }
+  // }
 });
 export {
   vite_config_default as default

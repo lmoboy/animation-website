@@ -102,18 +102,12 @@ WORKDIR /var/www/html
 # Copy existing application directory
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --optimize-autoloader --no-dev
-
-# Install Node dependencies with platform-specific binaries
-RUN rm -rf node_modules package-lock.json \
-    && npm install --platform=linux --arch=x64 \
-    && npm rebuild node-sass \
-    && npm run build
+# Install project dependencies
+RUN composer install
+RUN npm install
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage
-RUN chmod -R 775 /var/www/html/storage
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 8000
 

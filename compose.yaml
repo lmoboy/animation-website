@@ -1,33 +1,67 @@
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Docker Compose reference guide at
-# https://docs.docker.com/go/compose-spec-reference/
-
-# Here the instructions define your application as a service called "server".
-# This service is built from the Dockerfile in the current directory.
-# You can add other services your application may depend on here, such as a
-# database or a cache. For examples, see the Awesome Compose repository:
-# https://github.com/docker/awesome-compose
+version: '3.8'
 
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: animations-app
+    restart: unless-stopped
+    working_dir: /var/www/html
     volumes:
       - .:/var/www/html
-      - /var/www/html/node_modules
-    ports:
-      - "8000:8000"
-      - "5173:5173"
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - VITE_APP_NAME="${APP_NAME}"
-      - HOST=0.0.0.0
     networks:
       - animations_network
-    command: sh -c "npm install --platform=linux --arch=x64 && VITE_HOST=0.0.0.0 npm run dev & php artisan serve --host=0.0.0.0 --port=8000"
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:alpine
+    container_name: animations-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx:/etc/nginx/conf.d/
+    networks:
+      - animations_network
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: animations-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - animations_network
+
+  node:
+    image: node:20
+    container_name: animations-node
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev"
+    networks:
+      - animations_network
 
 networks:
   animations_network:
     driver: bridge
+
+volumes:
+  dbdata:

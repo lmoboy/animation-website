@@ -205,8 +205,6 @@ export default function Create({ auth }) {
             });
         }
 
-        let currentTime = 0;
-        const startTime = performance.now();
 
         // Create timeline
         const timelineAnimation = anime.timeline({

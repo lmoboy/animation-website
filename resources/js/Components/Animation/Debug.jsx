@@ -7,18 +7,18 @@ export default function Debug({ state }) {
     return (
         <div className="fixed bottom-4 right-4 z-50">
             <div className={`
-                bg-gray-900/90 backdrop-blur-sm rounded-xl border border-gray-800 
+                bg-slate-900 rounded-md border border-slate-700
                 transition-all duration-300 ease-in-out flex flex-col
-                ${isExpanded ? 'h-[500px] w-96' : 'h-12 w-48'}
+                ${isExpanded ? 'h-[500px] w-96' : 'h-10 w-40'}
             `}>
                 {/* Header */}
-                <div className="flex-none p-4 border-b border-gray-800">
+                <div className="flex-none px-3 py-2 bg-slate-800 rounded-t-md">
                     <div className="flex items-center justify-between">
                         <button 
                             onClick={() => setIsExpanded(!isExpanded)}
-                            className="flex items-center gap-2 text-sm font-semibold text-purple-300 hover:text-purple-200"
+                            className="flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white"
                         >
-                            <span>Debug Panel</span>
+                            <span>Debug</span>
                             {isExpanded ? (
                                 <ChevronDownIcon className="w-4 h-4" />
                             ) : (
@@ -29,9 +29,9 @@ export default function Debug({ state }) {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => console.clear()}
-                                    className="text-xs px-2 py-1 bg-gray-800 text-gray-300 rounded hover:bg-gray-700"
+                                    className="text-xs px-2 py-1 bg-slate-700 text-slate-300 rounded hover:bg-slate-600"
                                 >
-                                    Clear Console
+                                    Clear
                                 </button>
                             </div>
                         )}
@@ -41,11 +41,11 @@ export default function Debug({ state }) {
                 {/* Content */}
                 {isExpanded && (
                     <div className="flex-1 overflow-hidden">
-                        <div className="h-full overflow-y-auto p-4 space-y-4">
+                        <div className="h-full overflow-y-auto p-3 space-y-2">
                             {Object.entries(state).map(([key, value]) => (
                                 <div key={key} className="space-y-1">
-                                    <div className="text-xs font-medium text-purple-200">{key}</div>
-                                    <pre className="text-xs bg-gray-800/50 rounded p-2 overflow-x-auto text-white whitespace-pre-wrap break-words">
+                                    <div className="text-xs font-medium text-slate-400">{key}</div>
+                                    <pre className="text-xs bg-slate-800 rounded p-2 overflow-x-auto text-slate-200 font-mono">
                                         {JSON.stringify(value, null, 2)}
                                     </pre>
                                 </div>

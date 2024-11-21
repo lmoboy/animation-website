@@ -20,7 +20,7 @@ export default function Dashboard({ auth }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
                         {/* Create Animation Card */}
                         <Link
-                            href={route("animation.create")}
+                            href={route("create")}
                             className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
                         >
                             <div className="p-6">
@@ -53,7 +53,7 @@ export default function Dashboard({ auth }) {
 
                         {/* Browse Animations Card */}
                         <Link
-                            href={route("animation.explore")}
+                            href={route("explore")}
                             className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
                         >
                             <div className="p-6">
@@ -86,7 +86,7 @@ export default function Dashboard({ auth }) {
 
                         {/* Community Card */}
                         <Link
-                            href={route("animation.search")}
+                            href={route("search")}
                             className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
                         >
                             <div className="p-6">

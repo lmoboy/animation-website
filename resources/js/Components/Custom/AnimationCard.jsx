@@ -1,104 +1,127 @@
 import { Link } from "@inertiajs/react";
+import { useEffect, useRef } from 'react';
+import anime from 'animejs';
 
 export default function AnimationCard({ 
-    title = "Animation Title",
-    creator = "Creator Name",
-    duration = "0:00",
-    views = "0",
-    timeAgo = "just now",
-    featured = false,
-    trending = false,
-    trendingRank,
-    href = "#",
+    animation,
     horizontal = false,
-    className = ""
+    className = "",
+    onSelect
 }) {
+    const cardRef = useRef(null);
+    const previewCubeRef = useRef(null);
+
+    const playPreview = () => {
+        if (!animation.timeline?.length || !previewCubeRef.current) return;
+
+        // Reset cube state
+        anime({
+            targets: previewCubeRef.current,
+            translateX: '-50%',
+            translateY: '-50%',
+            rotate: 0,
+            scale: 1,
+            opacity: 1,
+            borderRadius: '5px',
+            backgroundColor: '#a855f7',
+            duration: 0
+        });
+
+        // Play first animation from timeline
+        const previewAnimation = animation.timeline[0];
+        anime({
+            targets: previewCubeRef.current,
+            ...previewAnimation,
+            duration: previewAnimation.duration || 1000,
+            loop: true,
+            direction: previewAnimation.direction || 'normal',
+            easing: previewAnimation.easing || 'easeInOutQuad'
+        });
+    };
+
+    const stopPreview = () => {
+        if (!previewCubeRef.current) return;
+        anime.remove(previewCubeRef.current);
+    };
+
+    useEffect(() => {
+        if (previewCubeRef.current) {
+            animation.previewRef = previewCubeRef;
+        }
+    }, [previewCubeRef.current]);
+
+    const baseClasses = "group relative bg-gray-900/50 backdrop-blur-xl overflow-hidden rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20 border border-white/10 hover:border-purple-500/50";
+    const orientationClasses = horizontal
+        ? "flex flex-row space-x-4"
+        : "flex flex-col";
+
     return (
-        <Link
-            href={href}
-            className={`bg-white/10 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden group hover:border-purple-500/50 transition-all duration-300 ${className}`}
+        <div 
+            ref={cardRef}
+            className={`${baseClasses} ${orientationClasses} ${className}`}
+            onMouseEnter={playPreview}
+            onMouseLeave={stopPreview}
+            onClick={() => onSelect(animation)}
         >
-            {horizontal ? (
-                <div className="flex">
-                    <div className="w-48 bg-black/30 relative group-hover:bg-black/40 transition-colors">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <svg className="w-8 h-8 text-white/20 group-hover:text-purple-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            </svg>
-                        </div>
+            {/* Preview Container */}
+            <div className={`relative ${horizontal ? 'w-48 h-32' : 'w-full aspect-video'} bg-black/50 overflow-hidden`}>
+                <div
+                    ref={previewCubeRef}
+                    className="absolute left-1/2 top-1/2 w-12 h-12 bg-purple-500"
+                />
+                
+                {animation.featured && (
+                    <div className="absolute top-2 left-2">
+                        <span className="inline-flex items-center rounded-md bg-yellow-500/10 backdrop-blur-sm px-2 py-1 text-xs font-medium text-yellow-300 ring-1 ring-inset ring-yellow-500/30">
+                            Featured
+                        </span>
                     </div>
-                    <div className="flex-1 p-4">
-                        <h4 className="text-lg font-semibold text-white mb-2">{title}</h4>
-                        <p className="text-gray-400 text-sm mb-3">By {creator}</p>
-                        <div className="flex justify-between items-center">
-                            <span className="text-gray-400 text-sm">{duration}</span>
-                            <div className="flex items-center space-x-2">
-                                <span className="text-gray-400 text-sm">{views} views</span>
-                                {trending && (
-                                    <>
-                                        <span className="text-purple-400">•</span>
-                                        <span className="text-purple-400 text-sm">#{trendingRank}</span>
-                                    </>
-                                )}
-                            </div>
-                        </div>
+                )}
+                
+                {animation.trending && (
+                    <div className="absolute top-2 right-2">
+                        <span className="inline-flex items-center rounded-full bg-pink-500/10 backdrop-blur-sm px-2 py-1 text-xs font-medium text-pink-300 ring-1 ring-inset ring-pink-500/30">
+                            #{animation.trendingRank}
+                        </span>
                     </div>
+                )}
+            </div>
+
+            {/* Content */}
+            <div className="relative flex-1 p-4">
+                <div className="flex justify-between items-start">
+                    <h3 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+                        {animation.name}
+                    </h3>
+                    <span className="text-sm text-gray-400 bg-gray-800/50 px-2 py-0.5 rounded-md">
+                        {((animation.duration || 0) / 1000).toFixed(1)}s
+                    </span>
                 </div>
-            ) : (
-                <>
-                    <div className="aspect-video bg-black/30 relative group-hover:bg-black/40 transition-colors">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <svg className={`${featured ? 'w-16 h-16' : 'w-12 h-12'} text-white/20 group-hover:text-purple-500 transition-colors`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <div className={`${featured ? 'p-6' : 'p-4'}`}>
-                        <h4 className={`${featured ? 'text-xl' : 'text-lg'} font-semibold text-white mb-2`}>{title}</h4>
-                        {featured ? (
-                            <>
-                                <p className="text-gray-400 mb-4">A stunning animation showcasing the best of our platform.</p>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center">
-                                        <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white font-semibold">
-                                            {creator.charAt(0)}
-                                        </div>
-                                        <span className="ml-2 text-white">{creator}</span>
-                                    </div>
-                                    <div className="flex items-center space-x-4">
-                                        <span className="text-gray-400">{views} views</span>
-                                        <button className="px-4 py-2 bg-purple-500 rounded-md text-white hover:bg-purple-600 transition-colors">
-                                            Watch Now
-                                        </button>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <p className="text-gray-400 text-sm mb-3">By {creator}</p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-400 text-sm">{duration}</span>
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-gray-400 text-sm">{views} views</span>
-                                        {timeAgo && (
-                                            <>
-                                                <span className="text-purple-400">•</span>
-                                                <span className="text-gray-400 text-sm">{timeAgo}</span>
-                                            </>
-                                        )}
-                                        {trending && (
-                                            <>
-                                                <span className="text-purple-400">•</span>
-                                                <span className="text-purple-400 text-sm">#{trendingRank}</span>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </>
-            )}
-        </Link>
+
+                <div className="mt-1 flex items-center space-x-1 text-sm text-gray-400">
+                    <span>{animation.user?.name}</span>
+                    <span>•</span>
+                    <span>{animation.views >= 1000 
+                        ? `${(animation.views / 1000).toFixed(1)}k` 
+                        : animation.views.toLocaleString()
+                    } views</span>
+                    <span>•</span>
+                    <span>{new Date(animation.created_at).toLocaleDateString()}</span>
+                </div>
+
+                {/* Price Tag */}
+                <div className="mt-2">
+                    {animation.price === 0 ? (
+                        <span className="inline-flex items-center rounded-md bg-emerald-500/10 backdrop-blur-sm px-2 py-1 text-xs font-medium text-emerald-300 ring-1 ring-inset ring-emerald-500/30">
+                            Free
+                        </span>
+                    ) : animation.price && (
+                        <span className="inline-flex items-center rounded-md bg-purple-500/10 backdrop-blur-sm px-2 py-1 text-xs font-medium text-purple-300 ring-1 ring-inset ring-purple-500/30">
+                            ${animation.price}
+                        </span>
+                    )}
+                </div>
+            </div>
+        </div>
     );
 }

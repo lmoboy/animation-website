@@ -10,7 +10,10 @@ return new class extends Migration
     {
         Schema::create('animations', function (Blueprint $table) {
             $table->increments('id');
-            $table->foreignId('parameter_id')->constrained('animation_parameters')->onDelete('cascade');
+            $table->string('name')->default('Untitled Animation');
+            $table->text('description')->nullable();
+            $table->json('timeline')->nullable();
+            $table->decimal('price', 8, 2)->default(0);
             $table->text('user_id');
             $table->integer('views')->default(0);
             $table->boolean('featured')->default(false);

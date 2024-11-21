@@ -11,7 +11,7 @@ export default function Search({ auth }) {
             duration: "2:30",
             views: "1.2k",
             timeAgo: "2 days ago",
-            href: "/animation/1"
+            href: "/animations/1"
         },
         {
             title: "Abstract Waves",
@@ -19,7 +19,7 @@ export default function Search({ auth }) {
             duration: "1:45",
             views: "3.4k",
             timeAgo: "1 week ago",
-            href: "/animation/2"
+            href: "/animations/2"
         },
         {
             title: "Geometric Patterns",
@@ -27,7 +27,7 @@ export default function Search({ auth }) {
             duration: "3:15",
             views: "856",
             timeAgo: "3 days ago",
-            href: "/animation/3"
+            href: "/animations/3"
         },
         {
             title: "Color Flow",
@@ -35,7 +35,7 @@ export default function Search({ auth }) {
             duration: "4:00",
             views: "2.1k",
             timeAgo: "5 days ago",
-            href: "/animation/4"
+            href: "/animations/4"
         },
         {
             title: "Dynamic Typography",
@@ -43,7 +43,7 @@ export default function Search({ auth }) {
             duration: "2:15",
             views: "1.5k",
             timeAgo: "1 day ago",
-            href: "/animation/5"
+            href: "/animations/5"
         },
         {
             title: "Motion Graphics",
@@ -51,7 +51,7 @@ export default function Search({ auth }) {
             duration: "1:30",
             views: "987",
             timeAgo: "4 days ago",
-            href: "/animation/6"
+            href: "/animations/6"
         }
     ];
 

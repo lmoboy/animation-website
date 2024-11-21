@@ -14,15 +14,38 @@ export default function Create({ auth }) {
     const [activeCategory, setActiveCategory] = useState(null);  // Currently selected tool category
     const [selectedTool, setSelectedTool] = useState(null);      // Currently selected tool
     const [toolSettings, setToolSettings] = useState({});        // Settings for all tools
+    const [appliedTools, setAppliedTools] = useState({});       // Track which tools have been applied
     const [timeline, setTimeline] = useState([]);               // List of animations to play
     const [timelineOpen, setTimelineOpen] = useState(true);     // Timeline panel visibility
     const [progress, setProgress] = useState(0);                // Animation progress (0-100)
     const [isPlaying, setIsPlaying] = useState(false);          // Whether animation is playing
     const [debugMode, setDebugMode] = useState(true);          // Show debug information
 
+    // Default cube state
+    const DEFAULT_CUBE_STATE = {
+        translateX: '-50%',
+        translateY: '-50%',
+        rotate: 0,
+        scale: 1,
+        opacity: 1,
+        borderRadius: '5px',
+        backgroundColor: '#6366f1'
+    };
+
     // Refs for DOM elements
     const progressRef = useRef(null);  // Progress bar element
     const cubeRef = useRef(null);      // Animated cube element
+
+    // Reset cube to default state
+    const resetCubeState = () => {
+        if (cubeRef.current) {
+            anime({
+                targets: '#anim_cube',
+                ...DEFAULT_CUBE_STATE,
+                duration: 0
+            });
+        }
+    };
 
     // Debug logging
     // useEffect(() => {
@@ -41,14 +64,15 @@ export default function Create({ auth }) {
     // Reset cube position and clear timeline
     const handleClean = () => {
         setTimeline([]);
-        if (cubeRef.current) {
-            cubeRef.current.style.transform = 'translate(-50%, -50%)';
-        }
+        setAppliedTools({});
+        setToolSettings({});
+        resetCubeState();
     };
 
     // Calculate total duration of all animations
     const totalDuration = timeline.reduce((total, anim) => {
-        return total + (anim.duration || 1000) + (anim.delay || 0) + (anim.endDelay || 0);
+        const loops = anim.loop || 1;
+        return total + ((anim.duration || 1000) + (anim.delay || 0) + (anim.endDelay || 0)) * loops;
     }, 0);
 
     // Update progress bar during playback
@@ -79,7 +103,22 @@ export default function Create({ auth }) {
 
     // Handle settings change
     const handleSettingsChange = (newValues) => {
-        // For regular tools, update settings as is
+        // Update applied tools tracking
+        const newAppliedTools = { ...appliedTools };
+        
+        // For each tool in toolSettings
+        Object.keys(toolSettings).forEach(tool => {
+            if (!(tool in newValues)) {
+                delete newAppliedTools[tool]; // Remove tool if it was removed
+            }
+        });
+        
+        // Add new/modified tools
+        Object.keys(newValues).forEach(tool => {
+            newAppliedTools[tool] = true;
+        });
+        
+        setAppliedTools(newAppliedTools);
         setToolSettings(newValues);
     };
 
@@ -96,7 +135,8 @@ export default function Create({ auth }) {
         let newAnimation = {
             targets: '#anim_cube',
             duration: 1000,
-            easing: 'easeInOutQuad'
+            easing: 'easeInOutQuad',
+            loop: toolSettings.loop?.value || 1
         };
 
         // Combine all settings from different tools
@@ -150,29 +190,6 @@ export default function Create({ auth }) {
 
         // Add the animation to timeline
         setTimeline(prevTimeline => [...prevTimeline, newAnimation]);
-
-        // Preview the animation
-        const previewAnimation = {
-            ...newAnimation,
-            complete: () => {
-                // Reset position after preview
-                if (cubeRef.current) {
-                    anime({
-                        targets: '#anim_cube',
-                        translateX: '-50%',
-                        translateY: '-50%',
-                        rotate: 0,
-                        duration: 0
-                    });
-                }
-            }
-        };
-
-        try {
-            anime(previewAnimation);
-        } catch (error) {
-            console.error('Animation preview failed:', error);
-        }
     };
 
     // Remove all settings for a tool
@@ -191,20 +208,10 @@ export default function Create({ auth }) {
             return;
         }
 
-        console.log('Playing timeline:', timeline);
         setIsPlaying(true);
 
-        // Reset cube position
-        if (cubeRef.current) {
-            anime({
-                targets: '#anim_cube',
-                translateX: '-50%',
-                translateY: '-50%',
-                rotate: 0,
-                duration: 0
-            });
-        }
-
+        // Reset cube to default state
+        resetCubeState();
 
         // Create timeline
         const timelineAnimation = anime.timeline({
@@ -218,9 +225,14 @@ export default function Create({ auth }) {
             }
         });
 
-        // Add each animation to the timeline
+        // Add each animation to the timeline with loop handling
         timeline.forEach((animation, index) => {
-            timelineAnimation.add(animation);
+            const loops = animation.loop || 1;
+            const animationWithLoop = {
+                ...animation,
+                loop: loops
+            };
+            timelineAnimation.add(animationWithLoop);
         });
     };
 
@@ -240,6 +252,7 @@ export default function Create({ auth }) {
                             activeCategory={activeCategory}
                             selectedTool={selectedTool}
                             toolSettings={toolSettings}
+                            appliedTools={appliedTools}
                             onCategoryClick={handleCategoryClick}
                             onToolClick={handleToolClick}
                             onSettingsChange={handleSettingsChange}

@@ -3,7 +3,7 @@ import { tools } from '@/Data/tools';
 import anime from 'animejs';
 
 // Tools component: Manages the UI for all animation tools and their settings
-export default function Tools({ activeCategory, selectedTool, toolSettings, onCategoryClick, onToolClick, onSettingsChange }) {
+export default function Tools({ activeCategory, selectedTool, toolSettings, onCategoryClick, onToolClick, onSettingsChange, appliedTools = {} }) {
     // Animate settings when they appear for smooth UI transitions
     useEffect(() => {
         if (selectedTool) {
@@ -86,8 +86,27 @@ export default function Tools({ activeCategory, selectedTool, toolSettings, onCa
                                                     : 'text-gray-400 hover:bg-gray-800/50'
                                         }`}
                                     >
-                                        <div className="text-sm font-medium">{tool.name}</div>
-                                        <div className="text-xs opacity-60">{tool.description}</div>
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <div className="text-sm font-medium">{tool.name}</div>
+                                                <div className="text-xs opacity-60">{tool.description}</div>
+                                            </div>
+                                            {appliedTools[tool.name] && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        const newSettings = { ...toolSettings };
+                                                        delete newSettings[tool.name];
+                                                        onSettingsChange(newSettings);
+                                                    }}
+                                                    className="text-gray-400 hover:text-red-400 p-1"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                        </div>
                                     </button>
                                 ))}
                             </div>
@@ -109,38 +128,61 @@ export default function Tools({ activeCategory, selectedTool, toolSettings, onCa
                                         <span className="text-gray-500 ml-1">({setting.unit})</span>
                                     )}
                                 </label>
-                                {/* Range slider for setting values */}
-                                <input
-                                    type={setting.type}
-                                    min={setting.min}
-                                    max={setting.max}
-                                    step={setting.step || 1}
-                                    value={toolSettings[selectedTool.name]?.[setting.name] || setting.default}
-                                    onChange={(e) => {
-                                        const value = parseFloat(e.target.value);
-                                        onSettingsChange({
-                                            ...toolSettings,
-                                            [selectedTool.name]: {
-                                                ...toolSettings[selectedTool.name],
-                                                [setting.name]: value
-                                            }
-                                        });
-                                    }}
-                                    className="w-full bg-gray-800 rounded-lg h-2 appearance-none cursor-pointer
-                                        [&::-webkit-slider-thumb]:appearance-none 
-                                        [&::-webkit-slider-thumb]:w-4 
-                                        [&::-webkit-slider-thumb]:h-4 
-                                        [&::-webkit-slider-thumb]:rounded-full 
-                                        [&::-webkit-slider-thumb]:bg-purple-500
-                                        [&::-webkit-slider-thumb]:hover:bg-purple-400
-                                        [&::-webkit-slider-thumb]:transition-colors"
-                                />
-                                {/* Value display */}
-                                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                                    <span>{setting.min}{setting.unit}</span>
-                                    <span>{toolSettings[selectedTool.name]?.[setting.name] || setting.default}{setting.unit}</span>
-                                    <span>{setting.max}{setting.unit}</span>
-                                </div>
+                                {setting.type === 'select' ? (
+                                    <select
+                                        value={toolSettings[selectedTool.name]?.[setting.name] || setting.default}
+                                        onChange={(e) => {
+                                            onSettingsChange({
+                                                ...toolSettings,
+                                                [selectedTool.name]: {
+                                                    ...toolSettings[selectedTool.name],
+                                                    [setting.name]: e.target.value
+                                                }
+                                            });
+                                        }}
+                                        className="w-full bg-gray-800 text-gray-300 rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:border-purple-500"
+                                    >
+                                        {setting.options.map((option) => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <>
+                                        <input
+                                            type={setting.type}
+                                            min={setting.min}
+                                            max={setting.max}
+                                            step={setting.step || 1}
+                                            value={toolSettings[selectedTool.name]?.[setting.name] || setting.default}
+                                            onChange={(e) => {
+                                                const value = parseFloat(e.target.value);
+                                                onSettingsChange({
+                                                    ...toolSettings,
+                                                    [selectedTool.name]: {
+                                                        ...toolSettings[selectedTool.name],
+                                                        [setting.name]: value
+                                                    }
+                                                });
+                                            }}
+                                            className="w-full bg-gray-800 rounded-lg h-2 appearance-none cursor-pointer
+                                                [&::-webkit-slider-thumb]:appearance-none 
+                                                [&::-webkit-slider-thumb]:w-4 
+                                                [&::-webkit-slider-thumb]:h-4 
+                                                [&::-webkit-slider-thumb]:rounded-full 
+                                                [&::-webkit-slider-thumb]:bg-purple-500
+                                                [&::-webkit-slider-thumb]:hover:bg-purple-400
+                                                [&::-webkit-slider-thumb]:transition-colors"
+                                        />
+                                        {/* Value display */}
+                                        <div className="flex justify-between text-xs text-gray-400 mt-1">
+                                            <span>{setting.min}{setting.unit}</span>
+                                            <span>{toolSettings[selectedTool.name]?.[setting.name] || setting.default}{setting.unit}</span>
+                                            <span>{setting.max}{setting.unit}</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         ))}
                     </div>

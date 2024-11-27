@@ -1,5 +1,3 @@
-# Create Component Documentation
-
 ## Overview
 The Create component serves as the main animation creation and management interface. It handles the application of animations to elements using anime.js and provides a dynamic system for managing animation properties.
 

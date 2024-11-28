@@ -54,7 +54,7 @@ export default function DeleteUserForm({ className = '' }) {
 
             <button
                 onClick={confirmUserDeletion}
-                className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-md hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200"
+                className="px-4 py-2 bg-linear-to-r from-red-600 to-pink-600 text-white rounded-md hover:from-red-700 hover:to-pink-700 focus:outline-hidden focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200"
             >
                 Delete Account
             </button>
@@ -91,7 +91,7 @@ export default function DeleteUserForm({ className = '' }) {
                     <div className="mt-6 flex justify-end">
                         <button
                             type="button"
-                            className="mr-3 px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200"
+                            className="mr-3 px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20 focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200"
                             onClick={closeModal}
                         >
                             Cancel
@@ -99,7 +99,7 @@ export default function DeleteUserForm({ className = '' }) {
 
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-md hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200 disabled:opacity-50"
+                            className="px-4 py-2 bg-linear-to-r from-red-600 to-pink-600 text-white rounded-md hover:from-red-700 hover:to-pink-700 focus:outline-hidden focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200 disabled:opacity-50"
                             disabled={processing}
                         >
                             Delete Account

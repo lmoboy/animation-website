@@ -8,7 +8,7 @@ export default function Dashboard({ auth }) {
         <AuthenticatedLayout
             user={auth.user}
             header={
-                <h2 className="font-semibold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-purple-300">
+                <h2 className="font-semibold text-2xl text-transparent bg-clip-text bg-linear-to-r from-gray-200 to-purple-300">
                     Dashboard
                 </h2>
             }
@@ -25,7 +25,7 @@ export default function Dashboard({ auth }) {
                         >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg">
+                                    <div className="p-3 bg-linear-to-r from-gray-800 to-gray-900 rounded-lg">
                                         <svg
                                             className="h-6 w-6 text-purple-300"
                                             fill="none"
@@ -58,7 +58,7 @@ export default function Dashboard({ auth }) {
                         >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg">
+                                    <div className="p-3 bg-linear-to-r from-gray-800 to-gray-900 rounded-lg">
                                         <svg
                                             className="h-6 w-6 text-purple-300"
                                             fill="none"
@@ -91,7 +91,7 @@ export default function Dashboard({ auth }) {
                         >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg">
+                                    <div className="p-3 bg-linear-to-r from-gray-800 to-gray-900 rounded-lg">
                                         <svg
                                             className="h-6 w-6 text-purple-300"
                                             fill="none"
@@ -124,7 +124,7 @@ export default function Dashboard({ auth }) {
                         >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg">
+                                    <div className="p-3 bg-linear-to-r from-gray-800 to-gray-900 rounded-lg">
                                         <svg
                                             className="h-6 w-6 text-purple-300"
                                             fill="none"

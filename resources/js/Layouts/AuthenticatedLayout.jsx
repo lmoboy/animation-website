@@ -13,7 +13,7 @@ export default function Authenticated({ user, header, children }) {
             {/* Background Elements */}
             <div className="fixed inset-0 z-0">
                 {/* Gradient Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900"></div>
                 
                 {/* Animated Orbs */}
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-screen filter blur-xl opacity-20"></div>
@@ -24,12 +24,12 @@ export default function Authenticated({ user, header, children }) {
             </div>
 
             {/* Navigation */}
-            <nav className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-50">
+            <nav className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
-                                <Link href="/">
+                                <Link href="/" className="transform hover:scale-105 transition-transform duration-300">
                                     <ApplicationLogo className="block h-9 w-auto fill-current text-purple-300" />
                                 </Link>
                             </div>
@@ -38,11 +38,23 @@ export default function Authenticated({ user, header, children }) {
                                 <NavLink
                                     href={route("dashboard")}
                                     active={route().current("dashboard")}
-                                    className={`inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none ${
-                                        route().current("dashboard") ? "text-purple-300" : "text-gray-400 hover:text-gray-200"
-                                    }`}
+                                    className="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none text-gray-300 hover:text-white"
                                 >
                                     Dashboard
+                                </NavLink>
+                                <NavLink
+                                    href={route("explore")}
+                                    active={route().current("explore")}
+                                    className="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none text-gray-300 hover:text-white"
+                                >
+                                    Explore
+                                </NavLink>
+                                <NavLink
+                                    href={route("create")}
+                                    active={route().current("create")}
+                                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg transform hover:scale-105 transition-all duration-300 mt-2"
+                                >
+                                    Create
                                 </NavLink>
                             </div>
                         </div>
@@ -75,15 +87,15 @@ export default function Authenticated({ user, header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link 
+                                        <Dropdown.Link
                                             href={route("profile.edit")}
                                             className="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-300 hover:bg-gray-800 focus:outline-none focus:bg-gray-800 transition duration-150 ease-in-out"
                                         >
                                             Profile
                                         </Dropdown.Link>
-                                        <Dropdown.Link 
-                                            href={route("logout")} 
-                                            method="post" 
+                                        <Dropdown.Link
+                                            href={route("logout")}
+                                            method="post"
                                             as="button"
                                             className="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-300 hover:bg-gray-800 focus:outline-none focus:bg-gray-800 transition duration-150 ease-in-out"
                                         >
@@ -125,13 +137,23 @@ export default function Authenticated({ user, header, children }) {
                         <ResponsiveNavLink
                             href={route("dashboard")}
                             active={route().current("dashboard")}
-                            className={`block w-full pl-3 pr-4 py-2 border-l-4 text-left text-base font-medium focus:outline-none transition duration-150 ease-in-out ${
-                                route().current("dashboard")
-                                    ? "border-purple-400 text-purple-300 bg-gray-800/50"
-                                    : "border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800 hover:border-gray-700"
-                            }`}
+                            className="block w-full pl-3 pr-4 py-2 border-l-4 text-left text-base font-medium transition duration-150 ease-in-out focus:outline-none"
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("explore")}
+                            active={route().current("explore")}
+                            className="block w-full pl-3 pr-4 py-2 border-l-4 text-left text-base font-medium transition duration-150 ease-in-out focus:outline-none"
+                        >
+                            Explore
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("create")}
+                            active={route().current("create")}
+                            className="block w-full pl-3 pr-4 py-2 border-l-4 text-left text-base font-medium transition duration-150 ease-in-out focus:outline-none"
+                        >
+                            Create
                         </ResponsiveNavLink>
                     </div>
 
@@ -160,15 +182,21 @@ export default function Authenticated({ user, header, children }) {
                 </div>
             </nav>
 
-            {/* Header */}
             {header && (
-                <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 shadow">
+                <header className="bg-gray-900/50 backdrop-blur-sm shadow border-b border-gray-800">
                     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
                 </header>
             )}
 
-            {/* Main Content */}
-            <main className="relative z-10">{children}</main>
+            <main className="relative z-10">
+                <div className="py-12">
+                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                        <div className="overflow-hidden shadow-xl sm:rounded-lg">
+                            {children}
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }

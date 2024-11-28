@@ -90,7 +90,7 @@ export default function AnimationCard({
             {/* Content */}
             <div className="relative flex-1 p-4">
                 <div className="flex justify-between items-start">
-                    <h3 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+                    <h3 className="text-lg font-semibold bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-pink-400">
                         {animation.name}
                     </h3>
                     <span className="text-sm text-gray-400 bg-gray-800/50 px-2 py-0.5 rounded-md">

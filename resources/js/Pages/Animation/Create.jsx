@@ -472,7 +472,7 @@ export default function Create({ auth }) {
                                                 id="name"
                                                 value={data.name}
                                                 onChange={e => setData('name', e.target.value)}
-                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                                                 placeholder="Enter animation name"
                                                 disabled={processing}
                                             />
@@ -490,7 +490,7 @@ export default function Create({ auth }) {
                                                     step="0.01"
                                                     value={data.price}
                                                     onChange={e => setData('price', e.target.value)}
-                                                    className="w-full pl-8 pr-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                                    className="w-full pl-8 pr-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                                                     placeholder="0.00"
                                                     disabled={processing}
                                                 />
@@ -504,7 +504,7 @@ export default function Create({ auth }) {
                                                 id="description"
                                                 value={data.description}
                                                 onChange={e => setData('description', e.target.value)}
-                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                                                 rows="3"
                                                 placeholder="Enter animation description"
                                                 disabled={processing}

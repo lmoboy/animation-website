@@ -33,14 +33,14 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                         >
                             <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/10 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
                                 {/* Glow Effects */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-fuchsia-500/20 to-pink-500/20 opacity-50"></div>
+                                <div className="absolute inset-0 bg-linear-to-br from-purple-500/20 via-fuchsia-500/20 to-pink-500/20 opacity-50"></div>
                                 
                                 <div className="relative">
                                     {/* Close Button */}
                                     <div className="absolute right-0 top-0 pr-4 pt-4 z-10">
                                         <button
                                             type="button"
-                                            className="rounded-lg bg-gray-900/50 backdrop-blur-sm text-gray-400 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 p-2 transition-colors duration-200"
+                                            className="rounded-lg bg-gray-900/50 backdrop-blur-sm text-gray-400 hover:text-gray-200 focus:outline-hidden focus:ring-2 focus:ring-purple-500/50 p-2 transition-colors duration-200"
                                             onClick={onClose}
                                         >
                                             <span className="sr-only">Close</span>
@@ -51,7 +51,7 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                                     <div className="px-6 pb-6 pt-5">
                                         <div className="sm:flex sm:items-start">
                                             <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                                                <Dialog.Title as="h3" className="text-2xl font-semibold leading-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+                                                <Dialog.Title as="h3" className="text-2xl font-semibold leading-6 bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-pink-400">
                                                     {animation.name}
                                                 </Dialog.Title>
                                                 
@@ -110,14 +110,14 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                                         <div className="mt-8 sm:flex sm:flex-row-reverse gap-3">
                                             <button
                                                 type="button"
-                                                className="w-full sm:w-auto rounded-lg px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold transform hover:scale-105 transition-all duration-300 hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                                className="w-full sm:w-auto rounded-lg px-6 py-2.5 bg-linear-to-r from-purple-500 to-pink-500 text-white font-semibold transform hover:scale-105 transition-all duration-300 hover:from-purple-600 hover:to-pink-600 focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
                                                 onClick={onClose}
                                             >
                                                 Download
                                             </button>
                                             <button
                                                 type="button"
-                                                className="mt-3 sm:mt-0 w-full sm:w-auto rounded-lg px-6 py-2.5 bg-gray-900/50 backdrop-blur-sm text-gray-300 font-semibold transform hover:scale-105 transition-all duration-300 hover:bg-gray-800/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-white/10"
+                                                className="mt-3 sm:mt-0 w-full sm:w-auto rounded-lg px-6 py-2.5 bg-gray-900/50 backdrop-blur-sm text-gray-300 font-semibold transform hover:scale-105 transition-all duration-300 hover:bg-gray-800/50 focus:outline-hidden focus:ring-2 focus:ring-purple-500/50 border border-white/10"
                                                 onClick={onClose}
                                             >
                                                 Close

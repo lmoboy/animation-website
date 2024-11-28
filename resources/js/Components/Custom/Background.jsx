@@ -30,7 +30,7 @@ export default function Background() {
                 const y = Math.floor(Math.random() * 100);
                 return (
                     <div
-                    className="cube absolute rounded-md blur-sm bg-gradient-to-br from-teal-700 to-sky-500"
+                    className="cube absolute rounded-md blur-xs bg-linear-to-br from-teal-700 to-sky-500"
                         key={i}
                         style={{
                             left: `${x}%`,

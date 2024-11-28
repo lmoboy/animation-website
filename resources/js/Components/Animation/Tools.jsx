@@ -140,7 +140,7 @@ export default function Tools({ activeCategory, selectedTool, toolSettings, onCa
                                                 }
                                             });
                                         }}
-                                        className="w-full bg-gray-800 text-gray-300 rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:border-purple-500"
+                                        className="w-full bg-gray-800 text-gray-300 rounded-lg px-3 py-2 border border-gray-700 focus:outline-hidden focus:border-purple-500"
                                     >
                                         {setting.options.map((option) => (
                                             <option key={option} value={option}>

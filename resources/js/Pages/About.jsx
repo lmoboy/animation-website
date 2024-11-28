@@ -57,7 +57,7 @@ export default function About({ auth }) {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {/* Hero Section */}
-                    <div ref={heroRef} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-black p-8 mb-8 opacity-0">
+                    <div ref={heroRef} className="relative overflow-hidden rounded-2xl bg-linear-to-br from-gray-900 to-black p-8 mb-8 opacity-0">
                         <div className="relative z-10">
                             <h1 className="text-4xl font-bold text-purple-300 mb-4">
                                 Bringing Animations to Life
@@ -117,7 +117,7 @@ export default function About({ auth }) {
                                     ref={el => teamRefs.current[index] = el}
                                     className="text-center opacity-0"
                                 >
-                                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-purple-700/20 flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+                                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-linear-to-br from-purple-500/20 to-purple-700/20 flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
                                         <svg className="w-12 h-12 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                         </svg>

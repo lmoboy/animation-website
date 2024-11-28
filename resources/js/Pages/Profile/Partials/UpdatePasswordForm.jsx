@@ -87,7 +87,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 <div className="flex items-center gap-4">
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-md hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200 disabled:opacity-50"
+                        className="px-4 py-2 bg-linear-to-r from-purple-600 to-pink-500 text-white rounded-md hover:from-purple-700 hover:to-pink-600 focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black transition-all duration-200 disabled:opacity-50"
                         disabled={processing}
                     >
                         Save

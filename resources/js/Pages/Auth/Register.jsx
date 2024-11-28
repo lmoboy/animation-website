@@ -56,7 +56,7 @@ export default function Register() {
 
             <div className="fixed inset-0 z-0">
                 {/* Gradient Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900"></div>
                 
                 {/* Animated Orbs */}
                 <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-500/30 rounded-full mix-blend-screen filter blur-xl opacity-30 animate-float"></div>
@@ -69,7 +69,7 @@ export default function Register() {
             <div className="register-content relative z-10 min-h-screen flex flex-col items-center justify-center">
                 <div className="w-full sm:max-w-md px-6">
                     <form onSubmit={submit} className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 shadow-2xl border border-gray-800">
-                        <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-gray-200 to-purple-300 text-transparent bg-clip-text text-center">Create Account</h2>
+                        <h2 className="text-2xl font-bold mb-6 bg-linear-to-r from-gray-200 to-purple-300 text-transparent bg-clip-text text-center">Create Account</h2>
 
                         <div className="form-field">
                             <InputLabel className="text-gray-300" htmlFor="name" value="Name" />
@@ -140,7 +140,7 @@ export default function Register() {
                             </Link>
 
                             <PrimaryButton
-                                className="ms-4 bg-gradient-to-r from-gray-800 to-gray-900 text-purple-300 hover:from-gray-900 hover:to-black border border-gray-700"
+                                className="ms-4 bg-linear-to-r from-gray-800 to-gray-900 text-purple-300 hover:from-gray-900 hover:to-black border border-gray-700"
                                 disabled={processing}
                             >
                                 Register

@@ -7,11 +7,7 @@ export default function Dashboard({ auth }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={
-                <h2 className="font-semibold text-2xl text-transparent bg-clip-text bg-linear-to-r from-gray-200 to-purple-300">
-                    Dashboard
-                </h2>
-            }
+
         >
             <Head title="Dashboard" />
 

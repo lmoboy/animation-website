@@ -62,15 +62,11 @@ export default function Tools({ activeCategory, selectedTool, toolSettings, onCa
                                         key={tool.name}
                                         onClick={() => {
                                             if (category === 'easing') {
-                                                // Special handling for easing tools as toggles
-                                                const newSettings = { ...toolSettings };
-                                                // Remove any existing easing
-                                                ['linear', 'easeInOut', 'easeIn', 'easeOut'].forEach(key => {
-                                                    delete newSettings[key];
+                                                // Special handling for easing tools
+                                                onSettingsChange({
+                                                    ...toolSettings,
+                                                    easing: tool.name
                                                 });
-                                                // Toggle the easing on/off
-                                                newSettings[tool.name] = true;
-                                                onSettingsChange(newSettings);
                                             } else {
                                                 // Regular tools show their settings panel
                                                 onToolClick(tool);
@@ -78,7 +74,7 @@ export default function Tools({ activeCategory, selectedTool, toolSettings, onCa
                                         }}
                                         className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
                                             category === 'easing' 
-                                                ? toolSettings[tool.name]
+                                                ? toolSettings.easing === tool.name
                                                     ? 'bg-purple-500/20 text-purple-300'
                                                     : 'text-gray-400 hover:bg-gray-800/50'
                                                 : selectedTool?.name === tool.name
@@ -130,14 +126,11 @@ export default function Tools({ activeCategory, selectedTool, toolSettings, onCa
                                 </label>
                                 {setting.type === 'select' ? (
                                     <select
-                                        value={toolSettings[selectedTool.name]?.[setting.name] || setting.default}
+                                        value={toolSettings[setting.name] || setting.default}
                                         onChange={(e) => {
                                             onSettingsChange({
                                                 ...toolSettings,
-                                                [selectedTool.name]: {
-                                                    ...toolSettings[selectedTool.name],
-                                                    [setting.name]: e.target.value
-                                                }
+                                                [setting.name]: e.target.value
                                             });
                                         }}
                                         className="w-full bg-gray-800 text-gray-300 rounded-lg px-3 py-2 border border-gray-700 focus:outline-hidden focus:border-purple-500"
@@ -155,31 +148,40 @@ export default function Tools({ activeCategory, selectedTool, toolSettings, onCa
                                             min={setting.min}
                                             max={setting.max}
                                             step={setting.step || 1}
-                                            value={toolSettings[selectedTool.name]?.[setting.name] || setting.default}
+                                            value={toolSettings[setting.name] || setting.default}
                                             onChange={(e) => {
-                                                const value = parseFloat(e.target.value);
+                                                const value = setting.type === 'number' ? parseFloat(e.target.value) : e.target.value;
                                                 onSettingsChange({
                                                     ...toolSettings,
-                                                    [selectedTool.name]: {
-                                                        ...toolSettings[selectedTool.name],
-                                                        [setting.name]: value
-                                                    }
+                                                    [setting.name]: value
                                                 });
                                             }}
-                                            className="w-full bg-gray-800 rounded-lg h-2 appearance-none cursor-pointer
-                                                [&::-webkit-slider-thumb]:appearance-none 
-                                                [&::-webkit-slider-thumb]:w-4 
-                                                [&::-webkit-slider-thumb]:h-4 
-                                                [&::-webkit-slider-thumb]:rounded-full 
-                                                [&::-webkit-slider-thumb]:bg-purple-500
-                                                [&::-webkit-slider-thumb]:hover:bg-purple-400
-                                                [&::-webkit-slider-thumb]:transition-colors"
+                                            className="w-full"
                                         />
-                                        {/* Value display */}
-                                        <div className="flex justify-between text-xs text-gray-400 mt-1">
-                                            <span>{setting.min}{setting.unit}</span>
-                                            <span>{toolSettings[selectedTool.name]?.[setting.name] || setting.default}{setting.unit}</span>
-                                            <span>{setting.max}{setting.unit}</span>
+                                        <div className="relative mt-2">
+                                            <div className="h-2 bg-gray-800 rounded-full">
+                                                <div
+                                                    className="absolute h-2 bg-purple-500 rounded-full"
+                                                    style={{
+                                                        width: `${((toolSettings[setting.name] || setting.default) - (setting.min || 0)) / ((setting.max || 100) - (setting.min || 0)) * 100}%`
+                                                    }}
+                                                />
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min={setting.min}
+                                                max={setting.max}
+                                                step={setting.step || 1}
+                                                value={toolSettings[setting.name] || setting.default}
+                                                onChange={(e) => {
+                                                    const value = parseFloat(e.target.value);
+                                                    onSettingsChange({
+                                                        ...toolSettings,
+                                                        [setting.name]: value
+                                                    });
+                                                }}
+                                                className="absolute inset-0 w-full h-2 opacity-0 cursor-pointer"
+                                            />
                                         </div>
                                     </>
                                 )}

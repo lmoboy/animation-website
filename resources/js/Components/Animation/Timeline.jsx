@@ -21,7 +21,7 @@ export default function Timeline({ timeline, timelineOpen, totalDuration, progre
                         </button>
                         <h3 className="text-lg font-semibold text-purple-300">Timeline</h3>
                         <span className="text-sm text-gray-400">
-                            {(totalDuration / 1000).toFixed(1)}s total
+                            {(totalDuration / 1000).toFixed(2)}s total
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -49,8 +49,12 @@ export default function Timeline({ timeline, timelineOpen, totalDuration, progre
             </div>
 
             {/* Timeline Content */}
-            <div className="timeline-content overflow-hidden transition-all duration-300">
-                <div className="p-4 space-y-2 max-h-[200px] overflow-y-auto">
+            <div 
+                className={`timeline-content overflow-hidden transition-all duration-300 ${
+                    timelineOpen ? 'max-h-[500px]' : 'max-h-0'
+                }`}
+            >
+                <div className="p-4 space-y-2 overflow-y-auto">
                     {timeline.map((animation, index) => (
                         <div 
                             key={index} 
@@ -60,10 +64,11 @@ export default function Timeline({ timeline, timelineOpen, totalDuration, progre
                             <div className="flex items-center justify-between">
                                 <div className="flex-1">
                                     {Object.entries(animation)
-                                        .filter(([key]) => key !== 'targets')
+                                        .filter(([key]) => !['targets', 'complete', 'update'].includes(key))
                                         .map(([key, value]) => (
                                             <div key={key} className="text-sm">
-                                                <span className="text-purple-300">{key}:</span> {value}
+                                                <span className="text-purple-300">{key}:</span>{' '}
+                                                {typeof value === 'function' ? '[Function]' : value}
                                             </div>
                                         ))}
                                 </div>
@@ -80,6 +85,9 @@ export default function Timeline({ timeline, timelineOpen, totalDuration, progre
                             </div>
                             <div className="text-xs text-gray-500 mt-1">
                                 {((animation.duration || 1000) / 1000).toFixed(1)}s
+                                {animation.delay > 0 && ` + ${(animation.delay / 1000).toFixed(1)}s delay`}
+                                {animation.endDelay > 0 && ` + ${(animation.endDelay / 1000).toFixed(1)}s end delay`}
+                                {animation.loop > 1 && ` × ${animation.loop} loops`}
                             </div>
                         </div>
                     ))}

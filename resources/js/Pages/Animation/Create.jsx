@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm } from '@inertiajs/react';
+import { tools } from '@/Data/tools';
 import Tools from '@/Components/Animation/Tools';
 import Timeline from '@/Components/Animation/Timeline';
 import Preview from '@/Components/Animation/Preview';
@@ -82,8 +83,19 @@ export default function Create({ auth }) {
 
     // Calculate total duration of all animations
     const totalDuration = timeline.reduce((total, anim) => {
-        const loops = anim.loop || 1;
-        return total + ((anim.duration || 1000) + (anim.delay || 0) + (anim.endDelay || 0)) * loops;
+        const loops = parseInt(anim.loop) || 1;
+        const duration = parseInt(anim.duration) || 1000;
+        const delay = parseInt(anim.delay) || 0;
+        const endDelay = parseInt(anim.endDelay) || 0;
+        const animationDuration = (duration + delay + endDelay) * loops;
+        console.log('Animation duration:', {
+            duration,
+            delay,
+            endDelay,
+            loops,
+            total: animationDuration
+        });
+        return total + animationDuration;
     }, 0);
 
     // Update progress bar during playback
@@ -129,8 +141,26 @@ export default function Create({ auth }) {
             newAppliedTools[tool] = true;
         });
         
+        // Flatten the settings structure
+        const flattenedSettings = {};
+        Object.entries(newValues).forEach(([tool, value]) => {
+            // Handle easing types
+            if (['linear', 'easeInOut', 'easeIn', 'easeOut', 'spring', 'elastic'].includes(tool)) {
+                flattenedSettings.easing = tool;
+                return;
+            }
+            
+            // Handle nested objects
+            if (typeof value === 'object') {
+                const [key, val] = Object.entries(value)[0];
+                flattenedSettings[key] = val;
+            } else {
+                flattenedSettings[tool] = value;
+            }
+        });
+        
         setAppliedTools(newAppliedTools);
-        setToolSettings(newValues);
+        setToolSettings(flattenedSettings);
     };
 
     // Add current settings to timeline as new animation
@@ -145,71 +175,49 @@ export default function Create({ auth }) {
         // Create base animation with defaults
         let newAnimation = {
             targets: '#anim_cube',
-            duration: 1000,
-            easing: 'easeInOutQuad',
-            loop: toolSettings.loop?.value || 1,
-            direction: toolSettings.direction?.direction || 'normal' // Fix direction parsing
+            duration: toolSettings.duration || 1000,
+            easing: toolSettings.easing ? getEasingValue(toolSettings.easing) : 'easeInOutQuad',
+            loop: toolSettings.loop || 1,
+            direction: toolSettings.direction || 'normal'
         };
 
-        // Combine all settings from different tools
-        Object.entries(toolSettings).forEach(([toolName, settings]) => {
-            // Handle easing types specially
-            if (['linear', 'easeInOut', 'easeIn', 'easeOut', 'spring', 'elastic'].includes(toolName)) {
-                const easingMap = {
-                    linear: 'linear',
-                    easeInOut: 'easeInOutQuad',
-                    easeIn: 'easeInQuad',
-                    easeOut: 'easeOutQuad',
-                    spring: 'spring(1, 80, 10, 0)',
-                    elastic: 'easeOutElastic(1, .5)'
-                };
-                newAnimation.easing = easingMap[toolName];
-                return;
-            }
+        // Map easing types to anime.js values
+        function getEasingValue(easingType) {
+            const easingMap = {
+                linear: 'linear',
+                easeInOut: 'easeInOutQuad',
+                easeIn: 'easeInQuad',
+                easeOut: 'easeOutQuad',
+                spring: 'spring(1, 80, 10, 0)',
+                elastic: 'easeOutElastic(1, .5)'
+            };
+            return easingMap[easingType] || 'easeInOutQuad';
+        }
 
-            // Handle direction specially
-            if (toolName === 'direction') {
-                const directionMap = {
-                    normal: 'normal',         // Regular animation from start to end
-                    reverse: 'reverse',       // Animation from end to start
-                    alternate: 'alternate',   // Animation goes back and forth, starting forward
-                    'alternate-reverse': 'alternate-reverse' // Animation goes back and forth, starting backward
-                };
-                newAnimation.direction = directionMap[settings.direction] || 'normal';
-                return;
-            }
+        // Add animation properties with units
+        const unitMap = {
+            translateX: 'px',
+            translateY: 'px',
+            rotate: 'deg',
+            scale: '',
+            skewX: 'deg',
+            skewY: 'deg',
+            opacity: '',
+            borderRadius: '%'
+        };
 
-            // Handle other settings
-            Object.entries(settings).forEach(([settingName, value]) => {
-                // Add unit if needed
-                const unitMap = {
-                    translateX: 'px',
-                    translateY: 'px',
-                    rotate: 'deg',
-                    scale: '',
-                    skewX: 'deg',
-                    skewY: 'deg',
-                    opacity: '',
-                    borderRadius: '%'
-                };
+        // Apply settings to animation
+        Object.entries(toolSettings).forEach(([property, value]) => {
+            // Skip special properties already handled
+            if (['easing', 'loop', 'direction', 'duration'].includes(property)) return;
 
-                // Special handling for color values
-                if (settingName === 'color') {
-                    newAnimation[toolName] = value;
-                    return;
-                }
+            // Add unit if needed
+            const unit = unitMap[property] || '';
+            const valueWithUnit = unit ? `${value}${unit}` : value;
 
-                // Add unit if it exists in the map
-                const unit = unitMap[toolName] || '';
-                const settingWithUnit = unit ? `${value}${unit}` : value;
-                
-                // Map tool setting to animation property
-                const animationProperty = toolName === 'distance' ? 'translate' + toolName.slice(-1).toUpperCase() :
-                                        settingName === 'radius' ? 'borderRadius' :
-                                        toolName;
-                
-                newAnimation[animationProperty] = settingWithUnit;
-            });
+            // Handle special property mappings
+            const animationProperty = property === 'radius' ? 'borderRadius' : property;
+            newAnimation[animationProperty] = valueWithUnit;
         });
 
         // Add the animation to timeline
@@ -218,9 +226,20 @@ export default function Create({ auth }) {
 
     // Remove all settings for a tool
     const handleRemoveSetting = (toolName) => {
-        if (toolSettings[toolName]) {
-            const newSettings = { ...toolSettings };
-            delete newSettings[toolName];
+        const newSettings = { ...toolSettings };
+        
+        // Get all settings associated with this tool from the tool definition
+        const tool = Object.values(tools)
+            .flatMap(category => category.tabs)
+            .find(t => t.name === toolName);
+            
+        if (tool?.settings) {
+            // Remove each setting associated with this tool
+            tool.settings.forEach(setting => {
+                delete newSettings[setting.name];
+            });
+            
+            // Update the settings
             setToolSettings(newSettings);
         }
     };
@@ -238,61 +257,63 @@ export default function Create({ auth }) {
         resetCubeState();
 
         // Create timeline
-        let currentTime = 0;
         const animations = [];
+        let currentTime = 0;
+        const totalTime = timeline.reduce((total, anim) => {
+            const loops = anim.loop || 1;
+            const duration = anim.duration || 1000;
+            const delay = anim.delay || 0;
+            const endDelay = anim.endDelay || 0;
+            return total + (duration + delay + endDelay) * loops;
+        }, 0);
 
         // First, create all individual animations
-        timeline.forEach((animation) => {
+        timeline.forEach((animation, index) => {
             const loops = animation.loop || 1;
             const duration = animation.duration || 1000;
             const delay = animation.delay || 0;
             const endDelay = animation.endDelay || 0;
             const totalDuration = duration + delay + endDelay;
 
-            // Create the animation
-            const animeAnimation = anime({
-                ...animation,
-                loop: false,
-                autoplay: false,
-                delay: currentTime + delay,
-            });
-
-            // Add it multiple times based on loop count
+            // Create a new animation instance for each loop
             for (let i = 0; i < loops; i++) {
+                const animeAnimation = anime({
+                    ...animation,
+                    loop: false,
+                    autoplay: false,
+                    delay: currentTime + delay,
+                    complete: function(anim) {
+                        const nextIndex = animations.indexOf(anim) + 1;
+                        if (nextIndex < animations.length) {
+                            animations[nextIndex].play();
+                        } else {
+                            setIsPlaying(false);
+                            setProgress(0);
+                            resetCubeState();
+                        }
+                    },
+                    update: function(anim) {
+                        // Calculate elapsed time including all previous animations
+                        const currentIndex = animations.indexOf(anim);
+                        let elapsedTime = currentTime * (currentIndex / animations.length);
+                        
+                        // Add progress of current animation
+                        elapsedTime += (anim.progress / 100) * duration;
+                        
+                        // Calculate overall progress as a percentage of total time
+                        const overallProgress = (elapsedTime / totalTime) * 100;
+                        setProgress(Math.min(overallProgress, 100));
+                    }
+                });
                 animations.push(animeAnimation);
                 currentTime += totalDuration;
             }
         });
 
-        // Create a sequence of animations
-        let currentAnimation = 0;
-        const playNextAnimation = () => {
-            if (currentAnimation >= animations.length) {
-                setIsPlaying(false);
-                setProgress(0);
-                resetCubeState();
-                return;
-            }
-
-            const anim = animations[currentAnimation];
-            anim.play();
-            
-            // Update progress based on current animation
-            const updateProgress = () => {
-                const overallProgress = ((currentAnimation + (anim.progress || 0) / 100) / animations.length) * 100;
-                setProgress(overallProgress);
-            };
-
-            anim.update = updateProgress;
-            
-            anim.complete = () => {
-                currentAnimation++;
-                playNextAnimation();
-            };
-        };
-
-        // Start playing
-        playNextAnimation();
+        // Start the first animation
+        if (animations.length > 0) {
+            animations[0].play();
+        }
     };
 
     // Handle save form submission
@@ -369,7 +390,6 @@ export default function Create({ auth }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Create Animation</h2>}
         >
             <Head>
                 <title>Create Animation</title>

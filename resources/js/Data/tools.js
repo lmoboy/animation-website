@@ -50,28 +50,28 @@ export const tools = {
                 name: 'translateX', 
                 description: 'Move element horizontally', 
                 settings: [
-                    { name: 'distance', type: 'range', min: -200, max: 200, default: 100, unit: 'px' },
+                    { name: 'translateX', type: 'range', min: -200, max: 200, default: 0, unit: 'px' },
                 ]
             },
             { 
                 name: 'translateY',
                 description: 'Move element vertically',
                 settings: [
-                    { name: 'distance', type: 'range', min: -200, max: 200, default: 100, unit: 'px' },
+                    { name: 'translateY', type: 'range', min: -200, max: 200, default: 0, unit: 'px' },
                 ]
             },
             { 
                 name: 'rotate',
                 description: 'Rotate element around its center',
                 settings: [
-                    { name: 'angle', type: 'range', min: -360, max: 360, default: 90, unit: 'deg' },
+                    { name: 'rotate', type: 'range', min: -360, max: 360, default: 0, unit: 'deg' },
                 ]
             },
             {
                 name: 'scale',
                 description: 'Scale element size',
                 settings: [
-                    { name: 'scale', type: 'range', min: 0.1, max: 2, step: 0.1, default: 1.5, unit: 'x' }
+                    { name: 'scale', type: 'range', min: 0.1, max: 2, step: 0.1, default: 1, unit: 'x' }
                 ]
             },
             {

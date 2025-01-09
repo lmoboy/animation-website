@@ -88,7 +88,6 @@ export default function Explore({ auth }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<PageHeader title="Community Animations" />}
         >
             <Head title="Community Animations" />
 

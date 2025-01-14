@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/animations/{id}', [AnimationsController::class, 'show'])->name('animations.show');
     Route::put('/animations/{id}', [AnimationsController::class, 'update'])->name('animations.update');
     Route::delete('/animations/{id}', [AnimationsController::class, 'destroy'])->name('animations.destroy');
+    Route::post('/animations/{id}/views', [AnimationsController::class, 'incrementViews'])->name('animations.increment-views');
 });
 
 require __DIR__.'/auth.php';

@@ -1,37 +1,37 @@
 import React, { useState, useRef, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { tools } from '@/Data/tools';
 import Tools from '@/Components/Animation/Tools';
 import Timeline from '@/Components/Animation/Timeline';
 import Preview from '@/Components/Animation/Preview';
 import Controls from '@/Components/Animation/Controls';
 import Debug from '@/Components/Animation/Debug';
+import Toast from '@/Components/Custom/Toast';
 import anime from 'animejs';
 
 // Main animation creation component
 export default function Create({ auth }) {
     // State management
-    const [activeCategory, setActiveCategory] = useState(null);  // Currently selected tool category
-    const [selectedTool, setSelectedTool] = useState(null);      // Currently selected tool
-    const [toolSettings, setToolSettings] = useState({});        // Settings for all tools
-    const [appliedTools, setAppliedTools] = useState({});       // Track which tools have been applied
-    const [timeline, setTimeline] = useState([]);               // List of animations to play
-    const [timelineOpen, setTimelineOpen] = useState(true);     // Timeline panel visibility
-    const [progress, setProgress] = useState(0);                // Animation progress (0-100)
-    const [isPlaying, setIsPlaying] = useState(false);          // Whether animation is playing
-    const [debugMode, setDebugMode] = useState(true);          // Show debug information
+    const [activeCategory, setActiveCategory] = useState(null);
+    const [selectedTool, setSelectedTool] = useState(null);
+    const [toolSettings, setToolSettings] = useState({});
+    const [appliedTools, setAppliedTools] = useState({});
+    const [timeline, setTimeline] = useState([]);
+    const [timelineOpen, setTimelineOpen] = useState(true);
+    const [progress, setProgress] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [debugMode, setDebugMode] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [error, setError] = useState(null);
-    const [savedAnimationId, setSavedAnimationId] = useState(null);
-    const errorBoxRef = useRef(null);
-
-    const { data, setData, post, processing } = useForm({
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('success');
+    const [formData, setFormData] = useState({
         name: '',
         description: '',
         price: '0.00',
-        timeline: []
     });
+    const [processing, setProcessing] = useState(false);
 
     // Default cube state
     const DEFAULT_CUBE_STATE = {
@@ -258,7 +258,9 @@ export default function Create({ auth }) {
 
         // Create timeline
         const animations = [];
-        let currentTime = 0;
+        let totalDuration = 0;
+
+        // Calculate total duration for progress calculation
         const totalTime = timeline.reduce((total, anim) => {
             const loops = anim.loop || 1;
             const duration = anim.duration || 1000;
@@ -267,21 +269,23 @@ export default function Create({ auth }) {
             return total + (duration + delay + endDelay) * loops;
         }, 0);
 
-        // First, create all individual animations
+        // Create all individual animations
         timeline.forEach((animation, index) => {
             const loops = animation.loop || 1;
             const duration = animation.duration || 1000;
             const delay = animation.delay || 0;
             const endDelay = animation.endDelay || 0;
-            const totalDuration = duration + delay + endDelay;
 
             // Create a new animation instance for each loop
             for (let i = 0; i < loops; i++) {
                 const animeAnimation = anime({
+                    targets: '.cube',  // Ensure we're targeting the cube
                     ...animation,
                     loop: false,
                     autoplay: false,
-                    delay: currentTime + delay,
+                    delay: delay,  // Use the animation's own delay property
+                    duration: duration,
+                    endDelay: endDelay,
                     complete: function(anim) {
                         const nextIndex = animations.indexOf(anim) + 1;
                         if (nextIndex < animations.length) {
@@ -293,20 +297,19 @@ export default function Create({ auth }) {
                         }
                     },
                     update: function(anim) {
-                        // Calculate elapsed time including all previous animations
+                        // Calculate overall progress based on current animation's progress
                         const currentIndex = animations.indexOf(anim);
-                        let elapsedTime = currentTime * (currentIndex / animations.length);
+                        const previousDuration = animations
+                            .slice(0, currentIndex)
+                            .reduce((total, a) => total + (a.duration || 1000), 0);
                         
-                        // Add progress of current animation
-                        elapsedTime += (anim.progress / 100) * duration;
-                        
-                        // Calculate overall progress as a percentage of total time
-                        const overallProgress = (elapsedTime / totalTime) * 100;
+                        const currentProgress = (anim.progress / 100) * duration;
+                        const overallProgress = ((previousDuration + currentProgress) / totalTime) * 100;
                         setProgress(Math.min(overallProgress, 100));
                     }
                 });
                 animations.push(animeAnimation);
-                currentTime += totalDuration;
+                totalDuration += duration + delay + endDelay;
             }
         });
 
@@ -319,81 +322,66 @@ export default function Create({ auth }) {
     // Handle save form submission
     const handleSave = async (e) => {
         e.preventDefault();
-        setError(null);
+        setProcessing(true);
         
         try {
-            if (!data.name.trim()) {
+            if (!formData.name.trim()) {
                 throw new Error('Please enter a name for your animation');
             }
             if (timeline.length === 0) {
                 throw new Error('Please add at least one animation to the timeline');
             }
-            if (isNaN(parseFloat(data.price)) || parseFloat(data.price) < 0) {
+            if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) < 0) {
                 throw new Error('Please enter a valid price');
             }
 
-            // Update form data with current timeline
-            setData('timeline', timeline);
-
-            // Use Inertia's post with callbacks
-            post('/animations', {
+            // Use Inertia router to submit the form with timeline as JSON
+            router.post('/animations', {
+                ...formData,
+                timeline: timeline // Send timeline directly as JSON
+            }, {
                 preserveScroll: true,
-                preserveState: true,
-                onSuccess: (response) => {
-                    // Handle success
-                    if (response?.props?.animation?.id) {
-                        setSavedAnimationId(response.props.animation.id);
-                    }
-                    setError({
-                        message: 'Animation created successfully! You will be redirected to view it shortly.',
-                        type: 'success'
-                    });
-                    // Reset form
-                    setData({
+                onSuccess: () => {
+                    setToastMessage('Animation saved successfully!');
+                    setToastType('success');
+                    setShowToast(true);
+                    
+                    // Reset all states
+                    setFormData({
                         name: '',
                         description: '',
                         price: '0.00',
-                        timeline: []
                     });
+                    setTimeline([]);
+                    setAppliedTools({});
+                    setToolSettings({});
+                    setProgress(0);
+                    setIsPlaying(false);
+                    setIsSaving(false);
+                    resetCubeState();
                 },
                 onError: (errors) => {
-                    // Handle validation errors
                     const firstError = Object.values(errors)[0];
-                    setError({
-                        message: firstError || 'An error occurred while saving the animation',
-                        type: 'error'
-                    });
-                    // Animate error box
-                    if (errorBoxRef.current) {
-                        anime({
-                            targets: errorBoxRef.current,
-                            translateX: [
-                                { value: -10, duration: 100 },
-                                { value: 10, duration: 100 },
-                                { value: -5, duration: 100 },
-                                { value: 5, duration: 100 },
-                                { value: 0, duration: 100 }
-                            ],
-                            easing: 'easeInOutSine'
-                        });
-                    }
+                    setToastMessage(firstError || 'An error occurred while saving the animation');
+                    setToastType('error');
+                    setShowToast(true);
+                },
+                onFinish: () => {
+                    setProcessing(false);
                 }
             });
         } catch (error) {
-            setError({
-                message: error.message || 'An error occurred while saving the animation',
-                type: 'error'
-            });
+            setToastMessage(error.message);
+            setToastType('error');
+            setShowToast(true);
+            setProcessing(false);
         }
     };
 
     return (
         <AuthenticatedLayout
             user={auth.user}
-        >
-            <Head>
-                <title>Create Animation</title>
-            </Head>
+            >
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="flex justify-end mb-4">
@@ -456,136 +444,131 @@ export default function Create({ auth }) {
                         </div>
 
                         {/* Save Form */}
-                        <div 
-                            className={`absolute top-0 right-0 w-full h-full transition-transform duration-500 ease-in-out ${
-                                isSaving ? 'translate-x-0' : 'translate-x-full'
-                            }`}
-                        >
-                            <div className="flex items-center justify-center w-full h-full">
-                                <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-800 p-6 w-[500px] relative">
-                                    {error && (
-                                        <div 
-                                            ref={errorBoxRef}
-                                            className={`absolute -bottom-16 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg 
-                                                ${error.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}
-                                                animate-fade-in`}
-                                            style={{
-                                                animation: 'fadeIn 0.3s ease-in-out'
-                                            }}
-                                        >
-                                            {error.message}
-                                            {error.type === 'success' && (
-                                                <div className="text-sm opacity-75 mt-1">
-                                                    Animation ID: {savedAnimationId}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                    <h3 className="text-xl font-semibold text-purple-300 mb-6">Save Animation</h3>
-                                    <form onSubmit={handleSave} className="space-y-6">
-                                        <div>
-                                            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
-                                                Animation Name
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="name"
-                                                value={data.name}
-                                                onChange={e => setData('name', e.target.value)}
-                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
-                                                placeholder="Enter animation name"
-                                                disabled={processing}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">
-                                                Price (USD)
-                                            </label>
-                                            <div className="relative">
-                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">$</span>
+                        {isSaving && (
+                            <div 
+                                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
+                                onClick={(e) => {
+                                    if (e.target === e.currentTarget) {
+                                        setIsSaving(false);
+                                    }
+                                }}
+                            >
+                                <div className="flex items-center justify-center w-full h-full" onClick={e => e.stopPropagation()}>
+                                    <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-800 p-6 w-[500px] relative">
+                                        <h3 className="text-xl font-semibold text-purple-300 mb-6">Save Animation</h3>
+                                        <form onSubmit={handleSave} className="space-y-6">
+                                            <div>
+                                                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Animation Name
+                                                </label>
                                                 <input
-                                                    type="number"
-                                                    id="price"
-                                                    min="0"
-                                                    step="0.01"
-                                                    value={data.price}
-                                                    onChange={e => setData('price', e.target.value)}
-                                                    className="w-full pl-8 pr-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
-                                                    placeholder="0.00"
+                                                    type="text"
+                                                    id="name"
+                                                    value={formData.name}
+                                                    onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                                                    placeholder="Enter animation name"
                                                     disabled={processing}
                                                 />
                                             </div>
-                                        </div>
-                                        <div>
-                                            <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
-                                                Description
-                                            </label>
-                                            <textarea
-                                                id="description"
-                                                value={data.description}
-                                                onChange={e => setData('description', e.target.value)}
-                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
-                                                rows="3"
-                                                placeholder="Enter animation description"
-                                                disabled={processing}
-                                            />
-                                        </div>
-                                        <div className="flex justify-end space-x-4">
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setIsSaving(false);
-                                                    setError(null);
-                                                }}
-                                                className="px-4 py-2 text-gray-400 hover:text-gray-300 transition-colors"
-                                                disabled={processing}
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                type="submit"
-                                                className={`px-4 py-2 bg-purple-500 text-white rounded-lg transition-colors ${
-                                                    processing ? 'opacity-75 cursor-not-allowed' : 'hover:bg-purple-600'
-                                                }`}
-                                                disabled={processing}
-                                            >
-                                                {processing ? 'Saving...' : 'Save Animation'}
-                                            </button>
-                                        </div>
-                                    </form>
+                                            <div>
+                                                <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Price (USD)
+                                                </label>
+                                                <div className="relative">
+                                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">$</span>
+                                                    <input
+                                                        type="number"
+                                                        id="price"
+                                                        min="0"
+                                                        step="0.01"
+                                                        value={formData.price}
+                                                        onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                                                        className="w-full pl-8 pr-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                                                        placeholder="0.00"
+                                                        disabled={processing}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Description
+                                                </label>
+                                                <textarea
+                                                    id="description"
+                                                    value={formData.description}
+                                                    onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                                                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                                                    rows="3"
+                                                    placeholder="Enter animation description"
+                                                    disabled={processing}
+                                                />
+                                            </div>
+                                            
+                                            <div className="flex justify-end space-x-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setIsSaving(false);
+                                                        setShowToast(false);
+                                                    }}
+                                                    className="px-4 py-2 text-gray-400 hover:text-gray-300 transition-colors"
+                                                    disabled={processing}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className={`px-4 py-2 bg-purple-500 text-white rounded-lg transition-colors ${
+                                                        processing ? 'opacity-75 cursor-not-allowed' : 'hover:bg-purple-600'
+                                                    }`}
+                                                    disabled={processing}
+                                                >
+                                                    {processing ? 'Saving...' : 'Save Animation'}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Debug Panel */}
+                        {debugMode && (
+                            <Debug
+                                state={{
+                                    activeCategory,
+                                    selectedTool,
+                                    toolSettings,
+                                    timeline,
+                                    isPlaying,
+                                    progress,
+                                    totalDuration
+                                }}
+                            />
+                        )}
+                        <Toast
+                            show={showToast}
+                            message={toastMessage}
+                            type={toastType}
+                            onClose={() => setShowToast(false)}
+                            duration={3000}
+                        />
+                        <style jsx>{`
+                            @keyframes fadeIn {
+                                from {
+                                    opacity: 0;
+                                    transform: translate(-50%, 10px);
+                                }
+                                to {
+                                    opacity: 1;
+                                    transform: translate(-50%, 0);
+                                }
+                            }
+                        `}</style>
                     </div>
                 </div>
             </div>
-
-            {/* Debug Panel */}
-            {debugMode && (
-                <Debug
-                    state={{
-                        activeCategory,
-                        selectedTool,
-                        toolSettings,
-                        timeline,
-                        isPlaying,
-                        progress,
-                        totalDuration
-                    }}
-                />
-            )}
-            <style jsx>{`
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                        transform: translate(-50%, 10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translate(-50%, 0);
-                    }
-                }
-            `}</style>
         </AuthenticatedLayout>
     );
 }

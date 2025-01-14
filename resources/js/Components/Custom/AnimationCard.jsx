@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 import anime from 'animejs';
 
 export default function AnimationCard({ 
@@ -10,17 +11,32 @@ export default function AnimationCard({
 }) {
     const cardRef = useRef(null);
     const previewCubeRef = useRef(null);
+    const [views, setViews] = useState(animation.views);
 
     const playPreview = () => {
         if (!animation.timeline?.length || !previewCubeRef.current) return;
+
+        // Define unit map for properties that need units
+        const unitMap = {
+            translateX: 'px',
+            translateY: 'px',
+            rotate: 'deg',
+            scale: '',
+            skewX: 'deg',
+            skewY: 'deg',
+            opacity: '',
+            borderRadius: '%'
+        };
 
         // Reset cube state
         anime({
             targets: previewCubeRef.current,
             translateX: '-50%',
             translateY: '-50%',
-            rotate: 0,
+            rotate: '0deg',
             scale: 1,
+            skewX: '0deg',
+            skewY: '0deg',
             opacity: 1,
             borderRadius: '5px',
             backgroundColor: '#a855f7',
@@ -29,19 +45,77 @@ export default function AnimationCard({
 
         // Play first animation from timeline
         const previewAnimation = animation.timeline[0];
+        
+        // Process animation properties to add units
+        const processedAnimation = {};
+        Object.entries(previewAnimation).forEach(([key, value]) => {
+            if (unitMap.hasOwnProperty(key)) {
+                processedAnimation[key] = unitMap[key] ? value + unitMap[key] : value;
+            } else {
+                processedAnimation[key] = value;
+            }
+        });
+
+        // Create the animation
         anime({
             targets: previewCubeRef.current,
-            ...previewAnimation,
+            ...processedAnimation,
             duration: previewAnimation.duration || 1000,
             loop: true,
             direction: previewAnimation.direction || 'normal',
-            easing: previewAnimation.easing || 'easeInOutQuad'
+            easing: previewAnimation.easing || 'easeInOutQuad',
+            complete: function(anim) {
+                // Reset to initial state when animation completes
+                anime({
+                    targets: previewCubeRef.current,
+                    translateX: '-50%',
+                    translateY: '-50%',
+                    rotate: '0deg',
+                    scale: 1,
+                    skewX: '0deg',
+                    skewY: '0deg',
+                    opacity: 1,
+                    borderRadius: '5px',
+                    backgroundColor: '#a855f7',
+                    duration: 0
+                });
+            }
         });
     };
 
     const stopPreview = () => {
         if (!previewCubeRef.current) return;
         anime.remove(previewCubeRef.current);
+        
+        // Reset to initial state
+        anime({
+            targets: previewCubeRef.current,
+            translateX: '-50%',
+            translateY: '-50%',
+            rotate: '0deg',
+            scale: 1,
+            skewX: '0deg',
+            skewY: '0deg',
+            opacity: 1,
+            borderRadius: '5px',
+            backgroundColor: '#a855f7',
+            duration: 0
+        });
+    };
+
+    const handleClick = async () => {
+        try {
+            // Increment views
+            const response = await axios.post(`/animations/${animation.id}/views`);
+            setViews(response.data.views);
+            
+            // Call onSelect callback
+            onSelect(animation);
+        } catch (error) {
+            console.error('Error incrementing views:', error);
+            // Still call onSelect even if view increment fails
+            onSelect(animation);
+        }
     };
 
     useEffect(() => {
@@ -60,14 +134,20 @@ export default function AnimationCard({
             ref={cardRef}
             className={`${baseClasses} ${orientationClasses} ${className}`}
             onMouseEnter={playPreview}
-            onMouseLeave={stopPreview}
-            onClick={() => onSelect(animation)}
+            onMouseLeave={stopPreview}  
+            onClick={handleClick}
         >
             {/* Preview Container */}
             <div className={`relative ${horizontal ? 'w-48 h-32' : 'w-full aspect-video'} bg-black/50 overflow-hidden`}>
+                {/* Center cube */}
                 <div
                     ref={previewCubeRef}
-                    className="absolute left-1/2 top-1/2 w-12 h-12 bg-purple-500"
+                    id="anim_cube"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-lg"
+                    style={{
+                        perspective: '400px',
+                        transformStyle: 'preserve-3d'
+                    }}
                 />
                 
                 {animation.featured && (
@@ -101,9 +181,9 @@ export default function AnimationCard({
                 <div className="mt-1 flex items-center space-x-1 text-sm text-gray-400">
                     <span>{animation.user?.name}</span>
                     <span>•</span>
-                    <span>{animation.views >= 1000 
-                        ? `${(animation.views / 1000).toFixed(1)}k` 
-                        : animation.views.toLocaleString()
+                    <span>{views >= 1000 
+                        ? `${(views / 1000).toFixed(1)}k` 
+                        : views.toLocaleString()
                     } views</span>
                     <span>•</span>
                     <span>{new Date(animation.created_at).toLocaleDateString()}</span>

@@ -25,6 +25,7 @@ class AnimationsFactory extends Factory
             'description' => fake()->sentence(),
             'timeline' => [
                 [
+                    'target' => "#anim_cube",
                     'type' => fake()->randomElement(['fade', 'slide', 'rotate', 'scale']),
                     'duration' => fake()->numberBetween(500, 2000),
                     'delay' => fake()->numberBetween(0, 500),

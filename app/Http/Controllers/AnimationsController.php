@@ -57,13 +57,16 @@ class AnimationsController extends Controller
         return $animation;
     }
 
+    /**
+     * Create a new animation
+     */
     public function create(Request $request)
     {
-        // Validate the request
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'timeline' => 'required|array'
+            'timeline' => 'required|array',
+            'price' => 'required|numeric|min:0'
         ]);
 
         if ($validator->fails()) {
@@ -71,20 +74,19 @@ class AnimationsController extends Controller
         }
 
         try {
-            // Calculate total duration from timeline
-            $totalDuration = collect($request->timeline)->sum(function($animation) {
-                $loops = $animation['loop'] ?? 1;
-                $duration = $animation['duration'] ?? 1000;
-                $delay = $animation['delay'] ?? 0;
-                $endDelay = $animation['endDelay'] ?? 0;
-                return ($duration + $delay + $endDelay) * $loops;
-            });
+            $totalDuration = 0;
+            foreach ($request->timeline as $animation) {
+                if (isset($animation['duration'])) {
+                    $totalDuration += $animation['duration'];
+                }
+            }
 
-            // Create the animation record
             $animation = new Animations();
             $animation->name = $request->name;
             $animation->description = $request->description;
-            $animation->timeline = $request->timeline;
+            $animation->timeline = $request->timeline; // Laravel will automatically JSON encode this
+            $animation->price = $request->price;
+            $animation->views = 0;
             $animation->user_id = Auth::id();
             $animation->duration = $totalDuration;
             $animation->save();
@@ -106,5 +108,19 @@ class AnimationsController extends Controller
         $animation = Animations::findOrFail($id);
         $animation->delete();
         return response()->json(['message' => 'Animation deleted successfully']);
+    }
+
+    /**
+     * Increment the view count for an animation
+     */
+    public function incrementViews($id)
+    {
+        try {
+            $animation = Animations::findOrFail($id);
+            $animation->increment('views');
+            return response()->json(['views' => $animation->views]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error incrementing views'], 500);
+        }
     }
 }

@@ -4,8 +4,12 @@ import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
 export default function Debug({ state }) {
     const [isExpanded, setIsExpanded] = useState(true);
 
+
+if(import.meta.env.VITE_PRODUCTION != "local" || import.meta.env.VITE_DEBUG != "true")
+    return(<></>)
+else
     return (
-        <div className="fixed bottom-4 right-4 z-50">
+        <div className="fixed bottom-4 right-4 z-[100]">
             <div className={`
                 bg-slate-900 rounded-md border border-slate-700
                 transition-all duration-300 ease-in-out flex flex-col

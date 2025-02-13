@@ -1,0 +1,11 @@
+/* Custom dark theme overrides */
+.bezier-editor-container {
+    --bce-colors-curve-line: #a855f7;
+    --bce-colors-handle-start: #f59e0b;
+    --bce-colors-handle-end: #3b82f6;
+    --bce-colors-handle-line: #4b5563;
+    --bce-colors-background: #1f2937;
+    --bce-colors-outerarea: #111827;
+    --bce-colors-row: #374151;
+    --bce-colors-handle-fixed: #6b7280;
+  }

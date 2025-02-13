@@ -21,7 +21,13 @@
     },
     "dependencies": {
         "@heroicons/react": "^2.2.0",
+        "@svgr/webpack": "^8.1.0",
         "animejs": "^3.2.2",
-        "lodash": "^4.17.21"
+        "lodash": "^4.17.21",
+        "path-browserify": "^1.0.1",
+        "prismjs": "^1.29.0",
+        "react-bezier-curve-editor": "^2.1.0",
+        "react-simple-code-editor": "^0.14.1",
+        "react-svg-path": "github:joemaddalone/react-svg-path"
     }
 }

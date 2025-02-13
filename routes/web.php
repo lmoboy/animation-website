@@ -49,6 +49,13 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('About');
     })->name('about');
 
+
+    Route::get('/forum', function (){
+        return Inertia::render('Animation/Forum');
+    })->name('forum');
+
+
+
     Route::get('/api/featured', [AnimationsController::class, 'featured'])->name('featured');
 
     Route::get('/api/animations/search', [AnimationSearchController::class, 'index'])->name('animations.search');

@@ -1,6 +1,4 @@
-import Background from "@/Components/Custom/Background";
-import CardContainer from "@/Components/Custom/CardContainer";
-import Waves from "@/Components/Custom/Waves";
+
 import { useState, useEffect, useRef } from "react";
 import { Link, Head } from "@inertiajs/react";
 import anime from "animejs";

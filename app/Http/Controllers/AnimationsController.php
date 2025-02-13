@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use App\Models\Animations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,6 @@ class AnimationsController extends Controller
     {
         $animation = Animations::findOrFail($id);
         
-        // Validate the request
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255',
             'description' => 'nullable|string',
@@ -41,25 +41,16 @@ class AnimationsController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // If timeline is updated, recalculate duration
         if ($request->has('timeline')) {
-            $totalDuration = collect($request->timeline)->sum(function($animation) {
-                $loops = $animation['loop'] ?? 1;
-                $duration = $animation['duration'] ?? 1000;
-                $delay = $animation['delay'] ?? 0;
-                $endDelay = $animation['endDelay'] ?? 0;
-                return ($duration + $delay + $endDelay) * $loops;
-            });
-            $request->merge(['duration' => $totalDuration]);
+            $timeline = $this->processTimeline($request->timeline);
+            $request->merge(['timeline' => $timeline]);
+            $request->merge(['duration' => $this->calculateTotalDuration($timeline)]);
         }
 
         $animation->update($request->all());
         return $animation;
     }
 
-    /**
-     * Create a new animation
-     */
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -74,27 +65,17 @@ class AnimationsController extends Controller
         }
 
         try {
-            $totalDuration = 0;
-            foreach ($request->timeline as $animation) {
-                if (isset($animation['duration'])) {
-                    $totalDuration += $animation['duration'];
-                }
-            }
-
+            $processedTimeline = $this->processTimeline($request->timeline);
+            
             $animation = new Animations();
             $animation->name = $request->name;
             $animation->description = $request->description;
-            $animation->timeline = $request->timeline; // Laravel will automatically JSON encode this
+            $animation->timeline = $processedTimeline;
             $animation->price = $request->price;
             $animation->views = 0;
             $animation->user_id = Auth::id();
-            $animation->duration = $totalDuration;
+            $animation->duration = $this->calculateTotalDuration($processedTimeline);
             $animation->save();
-
-            return response()->json([
-                'message' => 'Animation created successfully',
-                'animation' => $animation
-            ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error creating animation',
@@ -110,9 +91,6 @@ class AnimationsController extends Controller
         return response()->json(['message' => 'Animation deleted successfully']);
     }
 
-    /**
-     * Increment the view count for an animation
-     */
     public function incrementViews($id)
     {
         try {
@@ -122,5 +100,43 @@ class AnimationsController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error incrementing views'], 500);
         }
+    }
+
+    private function processTimeline(array $timeline): array
+    {
+        return array_map(function($step) {
+            return [
+                'targets' => $step['targets'] ?? '#anim_cube',
+                'duration' => $step['duration'] ?? 1000,
+                'easing' => $step['easing'] ?? 'easeInOutQuad',
+                'loop' => $step['loop'] ?? 1,
+                'direction' => $step['direction'] ?? 'normal',
+                'delay' => $step['delay'] ?? 0,
+                'endDelay' => $step['endDelay'] ?? 0,
+                'autoplay' => filter_var($step['autoplay'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                'properties' => array_diff_key($step, [
+                    'targets' => null,
+                    'duration' => null,
+                    'easing' => null,
+                    'loop' => null,
+                    'direction' => null,
+                    'delay' => null,
+                    'endDelay' => null,
+                    'autoplay' => null
+                ])
+            ];
+        }, $timeline);
+    }
+
+    private function calculateTotalDuration(array $timeline): int
+    { 
+        return array_reduce($timeline, function($total, $step) {
+            $loops = is_numeric($step['loop']) ? max(1, (int)$step['loop']) : 1;
+            $duration = $step['duration'] ?? 1000;
+            $delay = $step['delay'] ?? 0;
+            $endDelay = $step['endDelay'] ?? 0;
+            
+            return $total + (($duration + $delay + $endDelay) * $loops);
+        }, 0);
     }
 }

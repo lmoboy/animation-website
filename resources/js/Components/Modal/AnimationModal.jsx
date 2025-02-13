@@ -1,8 +1,43 @@
-import { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useEffect, useRef } from "react";
+import anime from "animejs";
 
 export default function AnimationModal({ isOpen, onClose, animation }) {
+    const cubeRef = useRef(null);
+
+    useEffect(() => {
+        if (!cubeRef.current || !animation) return;
+
+        anime.remove(cubeRef.current);
+
+        const tl = anime.timeline({
+            autoplay: true,
+            easing: "easeOutExpo",
+        });
+
+        animation.timeline.forEach((step) => {
+            const config = {
+                targets: cubeRef.current,
+                ...step.properties,
+                duration: step.duration,
+                delay: step.delay || 0,
+                easing: step.easing || "linear",
+                loop: step.loop || false,
+                direction: step.direction || "normal",
+            };
+
+            if (step.keyframes) {
+                tl.add({ ...config, keyframes: step.keyframes });
+            } else {
+                tl.add(config);
+            }
+        });
+
+        return () => tl.pause();
+    }, [animation, isOpen]);
+
     if (!animation) return null;
 
     return (
@@ -17,7 +52,7 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black/80 backdrop-blur-xl transition-opacity" />
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-xl" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 z-10 overflow-y-auto">
@@ -31,97 +66,103 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
-                            <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-gray-900/50 backdrop-blur-xl border border-white/10 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
-                                {/* Glow Effects */}
-                                <div className="absolute inset-0 bg-linear-to-br from-purple-500/20 via-fuchsia-500/20 to-pink-500/20 opacity-50"></div>
+                            <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900/60 to-gray-800/50 backdrop-blur-2xl border border-white/10 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
+                                {/* Glowing border effect */}
+                                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-500/30 to-pink-500/30 opacity-30 blur-3xl" />
                                 
-                                <div className="relative">
-                                    {/* Close Button */}
-                                    <div className="absolute right-0 top-0 pr-4 pt-4 z-10">
-                                        <button
-                                            type="button"
-                                            className="rounded-lg bg-gray-900/50 backdrop-blur-sm text-gray-400 hover:text-gray-200 focus:outline-hidden focus:ring-2 focus:ring-purple-500/50 p-2 transition-colors duration-200"
-                                            onClick={onClose}
-                                        >
-                                            <span className="sr-only">Close</span>
-                                            <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                                        </button>
-                                    </div>
-
-                                    <div className="px-6 pb-6 pt-5">
-                                        <div className="sm:flex sm:items-start">
-                                            <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                                                <Dialog.Title as="h3" className="text-2xl font-semibold leading-6 bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-pink-400">
-                                                    {animation.name}
-                                                </Dialog.Title>
-                                                
-                                                {/* Animation Preview */}
-                                                <div className="mt-6 bg-black/50 rounded-xl p-4 aspect-video relative overflow-hidden border border-white/10">
-                                                    <div ref={animation.previewRef} className="absolute left-1/2 top-1/2 w-12 h-12 bg-purple-500" />
-                                                </div>
-
-                                                {/* Animation Details */}
-                                                <div className="mt-6 grid grid-cols-2 gap-6">
-                                                    <div>
-                                                        <h4 className="text-sm font-medium text-gray-400">Creator</h4>
-                                                        <p className="mt-1 text-sm text-white">{animation.user?.name}</p>
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-sm font-medium text-gray-400">Price</h4>
-                                                        <div className="mt-1">
-                                                            {animation.price === 0 ? (
-                                                                <span className="inline-flex items-center rounded-md bg-emerald-500/10 backdrop-blur-sm px-2 py-1 text-xs font-medium text-emerald-300 ring-1 ring-inset ring-emerald-500/30">
-                                                                    Free
-                                                                </span>
-                                                            ) : (
-                                                                <span className="inline-flex items-center rounded-md bg-purple-500/10 backdrop-blur-sm px-2 py-1 text-xs font-medium text-purple-300 ring-1 ring-inset ring-purple-500/30">
-                                                                    ${animation.price}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-sm font-medium text-gray-400">Views</h4>
-                                                        <p className="mt-1 text-sm text-white">{animation.views}</p>
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-sm font-medium text-gray-400">Created</h4>
-                                                        <p className="mt-1 text-sm text-white">{new Date(animation.created_at).toLocaleDateString()}</p>
-                                                    </div>
-                                                </div>
-
-                                                {/* Description */}
-                                                <div className="mt-6">
-                                                    <h4 className="text-sm font-medium text-gray-400">Description</h4>
-                                                    <p className="mt-1 text-sm text-white">{animation.description}</p>
-                                                </div>
-
-                                                {/* Timeline */}
-                                                <div className="mt-6">
-                                                    <h4 className="text-sm font-medium text-gray-400">Animation Timeline</h4>
-                                                    <pre className="mt-1 text-sm text-white bg-black/50 p-4 rounded-xl overflow-auto border border-white/10">
-                                                        {JSON.stringify(animation.timeline, null, 2)}
-                                                    </pre>
-                                                </div>
-                                            </div>
+                                <div className="relative p-1">
+                                    {/* Animated gradient border */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-transparent to-pink-500/20 animate-gradient-rotate opacity-50 rounded-2xl" />
+                                    
+                                    <div className="relative bg-gray-900/50 rounded-2xl">
+                                        <div className="absolute right-4 top-4 z-10">
+                                            <button
+                                                type="button"
+                                                className="rounded-lg p-2 bg-gray-800/50 backdrop-blur-sm text-gray-400 hover:text-purple-300 transition-colors hover:bg-gray-700/30 hover:shadow-purple-500/10 hover:shadow-sm"
+                                                onClick={onClose}
+                                            >
+                                                <XMarkIcon className="h-6 w-6" />
+                                            </button>
                                         </div>
 
-                                        {/* Action Buttons */}
-                                        <div className="mt-8 sm:flex sm:flex-row-reverse gap-3">
-                                            <button
-                                                type="button"
-                                                className="w-full sm:w-auto rounded-lg px-6 py-2.5 bg-linear-to-r from-purple-500 to-pink-500 text-white font-semibold transform hover:scale-105 transition-all duration-300 hover:from-purple-600 hover:to-pink-600 focus:outline-hidden focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-                                                onClick={onClose}
+                                        <div className="px-6 pb-8 pt-6">
+                                            <Dialog.Title
+                                                as="h3"
+                                                className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400"
                                             >
-                                                Download
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="mt-3 sm:mt-0 w-full sm:w-auto rounded-lg px-6 py-2.5 bg-gray-900/50 backdrop-blur-sm text-gray-300 font-semibold transform hover:scale-105 transition-all duration-300 hover:bg-gray-800/50 focus:outline-hidden focus:ring-2 focus:ring-purple-500/50 border border-white/10"
-                                                onClick={onClose}
-                                            >
-                                                Close
-                                            </button>
+                                                {animation.name}
+                                            </Dialog.Title>
+
+                                            {/* Preview Container */}
+                                            <div className="mt-6 relative group bg-black/50 rounded-xl p-4 aspect-video border border-white/10 overflow-hidden">
+                                                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-20" />
+                                                <div className="absolute inset-0 bg-[radial-gradient(at_center_center,rgba(168,85,247,0.1),transparent)]" />
+                                                
+                                                {animation?.timeline.some(step => step.properties?.d) ? (
+                                                    <svg width="100%" height="100%">
+                                                        <path
+                                                            ref={cubeRef}
+                                                            id={animation.target}
+                                                            fill="currentColor"
+                                                            className="text-purple-500"
+                                                        />
+                                                    </svg>
+                                                ) : (
+                                                    <div
+                                                        ref={cubeRef}
+                                                        id={animation?.target}
+                                                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-2xl transform-gpu"
+                                                        style={{
+                                                            transformStyle: 'preserve-3d',
+                                                            perspective: '1000px'
+                                                        }}
+                                                    />
+                                                )}
+                                            </div>
+
+                                            {/* Details Grid */}
+                                            <div className="mt-6 grid grid-cols-2 gap-4">
+                                                {[
+                                                    ['Creator', animation.user?.name],
+                                                    ['Price', animation.price === 0 ? 
+                                                        <span className="badge-free">Free</span> : 
+                                                        <span className="badge-premium">${animation.price}</span>
+                                                    ],
+                                                    ['Views', animation.views],
+                                                    ['Created', new Date(animation.created_at).toLocaleDateString()]
+                                                ].map(([label, value]) => (
+                                                    <div key={label} className="p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/10">
+                                                        <p className="text-sm font-medium text-purple-300/80">{label}</p>
+                                                        <p className="mt-1 text-lg font-medium text-white">
+                                                            {value}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Description */}
+                                            <div className="mt-6 p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/10">
+                                                <h4 className="text-sm font-medium text-purple-300/80">Description</h4>
+                                                <p className="mt-2 text-gray-200 leading-relaxed">
+                                                    {animation.description || 'No description provided'}
+                                                </p>
+                                            </div>
+
+                                            {/* Action Buttons */}
+                                            <div className="mt-8 flex gap-3 justify-end">
+                                                <button
+                                                    onClick={onClose}
+                                                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500/80 to-pink-500/80 text-white font-semibold hover:from-purple-500 hover:to-pink-500 transition-all hover:shadow-lg hover:shadow-purple-500/20 transform hover:scale-[1.02] active:scale-95"
+                                                >
+                                                    Download
+                                                </button>
+                                                <button
+                                                    onClick={onClose}
+                                                    className="px-6 py-2.5 rounded-xl bg-gray-800/50 backdrop-blur-sm border border-white/10 text-gray-300 hover:text-white hover:bg-gray-700/30 transition-all"
+                                                >
+                                                    Close
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -131,5 +172,5 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                 </div>
             </Dialog>
         </Transition.Root>
-    )
+    );
 }

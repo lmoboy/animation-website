@@ -10,7 +10,6 @@ import Debug from '@/Components/Animation/Debug';
 import Toast from '@/Components/Custom/Toast';
 import anime from 'animejs';
 
-// Main animation creation component
 export default function Create({ auth }) {
     // State management
     const [activeCategory, setActiveCategory] = useState(null);
@@ -21,7 +20,7 @@ export default function Create({ auth }) {
     const [timelineOpen, setTimelineOpen] = useState(true);
     const [progress, setProgress] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [debugMode, setDebugMode] = useState(true);
+    const [debugMode, setDebugMode] = useState(import.meta.env.VITE_DEBUG == "true");
     const [isSaving, setIsSaving] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -117,10 +116,6 @@ export default function Create({ auth }) {
     // Handle tool selection
     const handleToolClick = (tool) => {
         console.log('Tool clicked:', tool);
-        // For easing tools, don't update selectedTool
-        if (activeCategory === 'easing') {
-            return;
-        }
         setSelectedTool(selectedTool?.name === tool.name ? null : tool);
     };
 
@@ -169,31 +164,18 @@ export default function Create({ auth }) {
             console.warn('No settings applied');
             return;
         }
-
+    
         console.log('Applying animation with settings:', toolSettings);
-
+    
         // Create base animation with defaults
         let newAnimation = {
             targets: '#anim_cube',
             duration: toolSettings.duration || 1000,
-            easing: toolSettings.easing ? getEasingValue(toolSettings.easing) : 'easeInOutQuad',
+            easing: toolSettings.easing || 'easeInOutQuad', // Directly use the easing value from settings
             loop: toolSettings.loop || 1,
             direction: toolSettings.direction || 'normal'
         };
-
-        // Map easing types to anime.js values
-        function getEasingValue(easingType) {
-            const easingMap = {
-                linear: 'linear',
-                easeInOut: 'easeInOutQuad',
-                easeIn: 'easeInQuad',
-                easeOut: 'easeOutQuad',
-                spring: 'spring(1, 80, 10, 0)',
-                elastic: 'easeOutElastic(1, .5)'
-            };
-            return easingMap[easingType] || 'easeInOutQuad';
-        }
-
+    
         // Add animation properties with units
         const unitMap = {
             translateX: 'px',
@@ -205,21 +187,21 @@ export default function Create({ auth }) {
             opacity: '',
             borderRadius: '%'
         };
-
+    
         // Apply settings to animation
         Object.entries(toolSettings).forEach(([property, value]) => {
             // Skip special properties already handled
             if (['easing', 'loop', 'direction', 'duration'].includes(property)) return;
-
+    
             // Add unit if needed
             const unit = unitMap[property] || '';
             const valueWithUnit = unit ? `${value}${unit}` : value;
-
+    
             // Handle special property mappings
             const animationProperty = property === 'radius' ? 'borderRadius' : property;
             newAnimation[animationProperty] = valueWithUnit;
         });
-
+    
         // Add the animation to timeline
         setTimeline(prevTimeline => [...prevTimeline, newAnimation]);
     };

@@ -82,7 +82,7 @@ export default function Dashboard({ auth }) {
 
                         {/* Community Card */}
                         <Link
-                            href={route("search")}
+                            href={route("forum")}
                             className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
                         >
                             <div className="p-6">

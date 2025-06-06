@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Log;
 use App\Models\Animations;
+use App\Models\OwnedAnimations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -21,7 +22,7 @@ class AnimationsController extends Controller
     {
         return Animations::all();
     }
-    
+
     public function show($id)
     {
         return Animations::findOrFail($id);
@@ -30,7 +31,7 @@ class AnimationsController extends Controller
     public function update(Request $request, $id)
     {
         $animation = Animations::findOrFail($id);
-        
+
         $validator = Validator::make($request->all(), [
             'name' => 'string|max:255',
             'description' => 'nullable|string',
@@ -51,6 +52,29 @@ class AnimationsController extends Controller
         return $animation;
     }
 
+    public function purchase($id)
+    {
+        $animation = Animations::findOrFail($id);
+        if (Auth::user()->points >= $animation->points) {
+            
+            Auth::user()->points -= $animation->points;
+            Auth::user()->save();
+            OwnedAnimations::create([
+                'user_id' => Auth::user()->id,
+                'animation_id' => $id
+            ]);
+            return response()->json([
+                'success' => true,
+                'debug' => [
+                    "user" => Auth::user(),
+                    "animation" => $animation
+                ]
+            ]);
+        } else {
+            return response()->json(['errors' => 'Not enough points'], 422);
+        }
+    }
+
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -66,7 +90,7 @@ class AnimationsController extends Controller
 
         try {
             $processedTimeline = $this->processTimeline($request->timeline);
-            
+
             $animation = new Animations();
             $animation->name = $request->name;
             $animation->description = $request->description;
@@ -104,7 +128,7 @@ class AnimationsController extends Controller
 
     private function processTimeline(array $timeline): array
     {
-        return array_map(function($step) {
+        return array_map(function ($step) {
             return [
                 'targets' => $step['targets'] ?? '#anim_cube',
                 'duration' => $step['duration'] ?? 1000,
@@ -129,13 +153,13 @@ class AnimationsController extends Controller
     }
 
     private function calculateTotalDuration(array $timeline): int
-    { 
-        return array_reduce($timeline, function($total, $step) {
-            $loops = is_numeric($step['loop']) ? max(1, (int)$step['loop']) : 1;
+    {
+        return array_reduce($timeline, function ($total, $step) {
+            $loops = is_numeric($step['loop']) ? max(1, (int) $step['loop']) : 1;
             $duration = $step['duration'] ?? 1000;
             $delay = $step['delay'] ?? 0;
             $endDelay = $step['endDelay'] ?? 0;
-            
+
             return $total + (($duration + $delay + $endDelay) * $loops);
         }, 0);
     }

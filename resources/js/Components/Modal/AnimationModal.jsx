@@ -7,6 +7,10 @@ import anime from "animejs";
 export default function AnimationModal({ isOpen, onClose, animation }) {
     const cubeRef = useRef(null);
 
+    function handlePurchase(animationID) {
+        fetch(route("animation.purchase", { id: animationID })).then();
+    }
+
     useEffect(() => {
         if (!cubeRef.current || !animation) return;
 
@@ -69,11 +73,11 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                             <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900/60 to-gray-800/50 backdrop-blur-2xl border border-white/10 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
                                 {/* Glowing border effect */}
                                 <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-500/30 to-pink-500/30 opacity-30 blur-3xl" />
-                                
+
                                 <div className="relative p-1">
                                     {/* Animated gradient border */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-transparent to-pink-500/20 animate-gradient-rotate opacity-50 rounded-2xl" />
-                                    
+
                                     <div className="relative bg-gray-900/50 rounded-2xl">
                                         <div className="absolute right-4 top-4 z-10">
                                             <button
@@ -97,12 +101,19 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                                             <div className="mt-6 relative group bg-black/50 rounded-xl p-4 aspect-video border border-white/10 overflow-hidden">
                                                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-20" />
                                                 <div className="absolute inset-0 bg-[radial-gradient(at_center_center,rgba(168,85,247,0.1),transparent)]" />
-                                                
-                                                {animation?.timeline.some(step => step.properties?.d) ? (
-                                                    <svg width="100%" height="100%">
+
+                                                {animation?.timeline.some(
+                                                    (step) => step.properties?.d
+                                                ) ? (
+                                                    <svg
+                                                        width="100%"
+                                                        height="100%"
+                                                    >
                                                         <path
                                                             ref={cubeRef}
-                                                            id={animation.target}
+                                                            id={
+                                                                animation.target
+                                                            }
                                                             fill="currentColor"
                                                             className="text-purple-500"
                                                         />
@@ -113,8 +124,10 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                                                         id={animation?.target}
                                                         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-2xl transform-gpu"
                                                         style={{
-                                                            transformStyle: 'preserve-3d',
-                                                            perspective: '1000px'
+                                                            transformStyle:
+                                                                "preserve-3d",
+                                                            perspective:
+                                                                "1000px",
                                                         }}
                                                     />
                                                 )}
@@ -123,16 +136,41 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                                             {/* Details Grid */}
                                             <div className="mt-6 grid grid-cols-2 gap-4">
                                                 {[
-                                                    ['Creator', animation.user?.name],
-                                                    ['Price', animation.price === 0 ? 
-                                                        <span className="badge-free">Free</span> : 
-                                                        <span className="badge-premium">${animation.price}</span>
+                                                    [
+                                                        "Creator",
+                                                        animation.user?.name,
                                                     ],
-                                                    ['Views', animation.views],
-                                                    ['Created', new Date(animation.created_at).toLocaleDateString()]
+                                                    [
+                                                        "Price",
+                                                        animation.price ===
+                                                        0 ? (
+                                                            <span className="badge-free">
+                                                                Free
+                                                            </span>
+                                                        ) : (
+                                                            <span className="badge-premium">
+                                                                $
+                                                                {
+                                                                    animation.price
+                                                                }
+                                                            </span>
+                                                        ),
+                                                    ],
+                                                    ["Views", animation.views],
+                                                    [
+                                                        "Created",
+                                                        new Date(
+                                                            animation.created_at
+                                                        ).toLocaleDateString(),
+                                                    ],
                                                 ].map(([label, value]) => (
-                                                    <div key={label} className="p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/10">
-                                                        <p className="text-sm font-medium text-purple-300/80">{label}</p>
+                                                    <div
+                                                        key={label}
+                                                        className="p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/10"
+                                                    >
+                                                        <p className="text-sm font-medium text-purple-300/80">
+                                                            {label}
+                                                        </p>
                                                         <p className="mt-1 text-lg font-medium text-white">
                                                             {value}
                                                         </p>
@@ -142,20 +180,29 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
 
                                             {/* Description */}
                                             <div className="mt-6 p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/10">
-                                                <h4 className="text-sm font-medium text-purple-300/80">Description</h4>
+                                                <h4 className="text-sm font-medium text-purple-300/80">
+                                                    Description
+                                                </h4>
                                                 <p className="mt-2 text-gray-200 leading-relaxed">
-                                                    {animation.description || 'No description provided'}
+                                                    {animation.description ||
+                                                        "No description provided"}
                                                 </p>
                                             </div>
 
                                             {/* Action Buttons */}
                                             <div className="mt-8 flex gap-3 justify-end">
-                                                <button
-                                                    onClick={onClose}
+                                                <a
+                                                    href={route(
+                                                        "animation.purchase",
+                                                        animation.id
+                                                    )}
+                                                    // onClick={handlePurchase(
+                                                    //     animation.id
+                                                    // )}
                                                     className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500/80 to-pink-500/80 text-white font-semibold hover:from-purple-500 hover:to-pink-500 transition-all hover:shadow-lg hover:shadow-purple-500/20 transform hover:scale-[1.02] active:scale-95"
                                                 >
-                                                    Download
-                                                </button>
+                                                    Purchase: {animation.price}
+                                                </a>
                                                 <button
                                                     onClick={onClose}
                                                     className="px-6 py-2.5 rounded-xl bg-gray-800/50 backdrop-blur-sm border border-white/10 text-gray-300 hover:text-white hover:bg-gray-700/30 transition-all"

@@ -5,16 +5,12 @@ import anime from "animejs";
 
 export default function Dashboard({ auth }) {
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-
-        >
+        <AuthenticatedLayout user={auth.user}>
             <Head title="Dashboard" />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-                        {/* Create Animation Card */}
                         <Link
                             href={route("create")}
                             className="dashboard-card group cursor-pointer bg-gray-900/80 backdrop-blur-md rounded-lg border border-gray-800 overflow-hidden hover:bg-gray-800/80 transition-all duration-300"
@@ -140,7 +136,8 @@ export default function Dashboard({ auth }) {
                                     </h3>
                                 </div>
                                 <p className="mt-4 text-gray-400">
-                                    Learn more about our team and the story behind our animation platform.
+                                    Learn more about our team and the story
+                                    behind our animation platform.
                                 </p>
                             </div>
                         </Link>

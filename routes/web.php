@@ -60,6 +60,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/api/animations/search', [AnimationSearchController::class, 'index'])->name('animations.search');
 
+    Route::get('/api/animations/purchase/{id}', [AnimationsController::class,'purchase'])->name('animation.purchase');
+
+
+
     Route::post('/animations', [AnimationsController::class, 'create'])->name('animations.create');
     Route::get('/animations', [AnimationsController::class, 'index'])->name('animations.index');
     Route::get('/animations/{id}', [AnimationsController::class, 'show'])->name('animations.show');

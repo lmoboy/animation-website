@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Log;
 use App\Models\Animations;
+use App\Models\User;
 use App\Models\OwnedAnimations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,26 +53,42 @@ class AnimationsController extends Controller
         return $animation;
     }
 
-    public function purchase($id)
+    public function purchase(Request $request, $id)
     {
         $animation = Animations::findOrFail($id);
-        if (Auth::user()->points >= $animation->points) {
-            
-            Auth::user()->points -= $animation->points;
-            Auth::user()->save();
-            OwnedAnimations::create([
-                'user_id' => Auth::user()->id,
-                'animation_id' => $id
+
+        if ($animation->user_id === $request->user()->id) {
+            return response()->json(['errors' => 'Cannot purchase your own animation'], 422);
+        }
+
+        if (
+            OwnedAnimations::where('user_id', $request->user()->id)
+                ->where('animation_id', $id)
+                ->exists()
+        ) {
+            return response()->json(['errors' => 'Animation already owned'], 422);
+        }
+
+        if ($request->user()->points < $animation->price) {
+            return response()->json(['errors' => 'Not enough points'], 422);
+        }
+
+        try {
+            // Deduct points and create ownership record in a transaction
+            $request->user()->decrement('points', $animation->price);
+
+            $ownedAnimation = OwnedAnimations::create([
+                'user_id' => $request->user()->id,
+                'animation_id' => $id,
             ]);
+
             return response()->json([
                 'success' => true,
-                'debug' => [
-                    "user" => Auth::user(),
-                    "animation" => $animation
-                ]
+                'message' => 'Animation purchased successfully',
+                'owned_animation' => $ownedAnimation,
             ]);
-        } else {
-            return response()->json(['errors' => 'Not enough points'], 422);
+        } catch (\Exception $e) {
+            return response()->json(['errors' => 'An error occurred during the purchase'], 500);
         }
     }
 

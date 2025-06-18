@@ -1,15 +1,70 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useEffect, useRef } from "react";
 import anime from "animejs";
 
-export default function AnimationModal({ isOpen, onClose, animation }) {
+export default function AnimationModal({
+    isOpen,
+    onClose,
+    animation,
+    ownedAnimations,
+}) {
     const cubeRef = useRef(null);
+    const [toast, setToast] = useState({
+        show: false,
+        message: "",
+        type: "success",
+    });
 
     function handlePurchase(animationID) {
-        fetch(route("animation.purchase", { id: animationID })).then();
+        console.log("Attempting to purchase animation:", animationID);
+        console.log("Owned animations:", ownedAnimations);
+        ownedAnimations.map((element) => {
+            console.log(element);
+        });
+        if (ownedAnimations.includes(animationID)) {
+            setToast({
+                show: true,
+                message: "You already own this animation!",
+                type: "error",
+            });
+            return;
+        }
+
+        fetch(route("animation.purchase", { id: animationID }))
+            .then((response) => {
+                if (response.ok) {
+                    setToast({
+                        show: true,
+                        message: "Purchase successful!",
+                        type: "success",
+                    });
+                } else {
+                    setToast({
+                        show: true,
+                        message: "Purchase failed!",
+                        type: "error",
+                    });
+                }
+            })
+            .catch(() => {
+                setToast({
+                    show: true,
+                    message: "An error occurred during purchase.",
+                    type: "error",
+                });
+            });
     }
+
+    useEffect(() => {
+        if (toast.show) {
+            const timer = setTimeout(
+                () => setToast({ ...toast, show: false }),
+                3000
+            );
+            return () => clearTimeout(timer);
+        }
+    }, [toast]);
 
     useEffect(() => {
         if (!cubeRef.current || !animation) return;
@@ -191,18 +246,20 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
 
                                             {/* Action Buttons */}
                                             <div className="mt-8 flex gap-3 justify-end">
-                                                <a
-                                                    href={route(
-                                                        "animation.purchase",
+                                                <button
+                                                    onClick={() =>
+                                                        handlePurchase(
+                                                            animation.id
+                                                        )
+                                                    }
+                                                    disabled={ownedAnimations.includes(
                                                         animation.id
                                                     )}
-                                                    // onClick={handlePurchase(
-                                                    //     animation.id
-                                                    // )}
                                                     className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500/80 to-pink-500/80 text-white font-semibold hover:from-purple-500 hover:to-pink-500 transition-all hover:shadow-lg hover:shadow-purple-500/20 transform hover:scale-[1.02] active:scale-95"
                                                 >
                                                     Purchase: {animation.price}
-                                                </a>
+                                                </button>
+
                                                 <button
                                                     onClick={onClose}
                                                     className="px-6 py-2.5 rounded-xl bg-gray-800/50 backdrop-blur-sm border border-white/10 text-gray-300 hover:text-white hover:bg-gray-700/30 transition-all"
@@ -210,6 +267,17 @@ export default function AnimationModal({ isOpen, onClose, animation }) {
                                                     Close
                                                 </button>
                                             </div>
+                                            {toast.show && (
+                                                <div
+                                                    className={`fixed bottom-4 left-4 z-50 px-4 py-2 rounded-lg shadow-lg ${
+                                                        toast.type === "success"
+                                                            ? "bg-green-500 text-white"
+                                                            : "bg-red-500 text-white"
+                                                    }`}
+                                                >
+                                                    {toast.message}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

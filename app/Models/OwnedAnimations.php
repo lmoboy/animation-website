@@ -18,6 +18,6 @@ class OwnedAnimations extends Model
 
     public function animation()
     {
-        return $this->belongsTo('App\Models\Animation');
+        return $this->belongsTo('App\Models\Animations');
     }
 }

@@ -8,11 +8,11 @@ import SearchBar from "@/Components/Common/SearchBar";
 import FilterTabs from "@/Components/Common/FilterTabs";
 import PageHeader from "@/Components/Common/PageHeader";
 
-export default function Explore({ auth }) {
+export default function Explore({ auth, ownedAnimations }) {
     const [animations, setAnimations] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [filter, setFilter] = useState('all');
-    const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState("all");
+    const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [meta, setMeta] = useState(null);
@@ -27,34 +27,41 @@ export default function Explore({ auth }) {
     ];
 
     const fetchAnimations = async (options = {}) => {
-        const { newSearch = search, newFilter = filter, newPage = 1, append = false } = options;
-        
+        const {
+            newSearch = search,
+            newFilter = filter,
+            newPage = 1,
+            append = false,
+        } = options;
+
         setLoading(true);
         try {
             const params = new URLSearchParams({
                 filter: newFilter,
                 page: newPage,
             });
-            
+
             if (newSearch) {
-                params.append('search', newSearch);
+                params.append("search", newSearch);
             }
 
-            const response = await fetch(`/api/animations/search?${params.toString()}`);
+            const response = await fetch(
+                `/api/animations/search?${params.toString()}`
+            );
             const data = await response.json();
-            
+
             setMeta(data.meta);
             setHasMore(data.meta.current_page < data.meta.last_page);
-            
+
             if (append) {
-                setAnimations(prev => [...prev, ...data.data]);
+                setAnimations((prev) => [...prev, ...data.data]);
             } else {
                 setAnimations(data.data);
             }
-            
+
             setPage(data.meta.current_page);
         } catch (error) {
-            console.error('Error fetching animations:', error);
+            console.error("Error fetching animations:", error);
         } finally {
             setLoading(false);
         }
@@ -86,9 +93,7 @@ export default function Explore({ auth }) {
     }, []);
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-        >
+        <AuthenticatedLayout user={auth.user}>
             <Head title="Community Animations" />
 
             <div className="py-12">
@@ -96,7 +101,7 @@ export default function Explore({ auth }) {
                     {/* Search and Filter Bar */}
                     <div className="mb-8 space-y-4">
                         <SearchBar onChange={handleSearchChange} />
-                        <FilterTabs 
+                        <FilterTabs
                             categories={categories}
                             activeFilter={filter}
                             onFilterChange={handleFilterChange}
@@ -109,6 +114,7 @@ export default function Explore({ auth }) {
                             <AnimationCard
                                 key={animation.id}
                                 animation={animation}
+                                ownedAnimations={ownedAnimations}
                                 onSelect={setSelectedAnimation}
                             />
                         ))}
@@ -122,7 +128,7 @@ export default function Explore({ auth }) {
                                 disabled={loading}
                                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
                             >
-                                {loading ? 'Loading...' : 'Load More'}
+                                {loading ? "Loading..." : "Load More"}
                             </button>
                         </div>
                     )}
@@ -132,6 +138,7 @@ export default function Explore({ auth }) {
                         isOpen={!!selectedAnimation}
                         onClose={() => setSelectedAnimation(null)}
                         animation={selectedAnimation}
+                        ownedAnimations={ownedAnimations}
                     />
                 </div>
             </div>

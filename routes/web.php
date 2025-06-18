@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AnimationsController;
 use App\Http\Controllers\Api\AnimationSearchController;
+use App\Models\OwnedAnimations;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -34,7 +35,10 @@ Route::middleware('auth')->group(function () {
     })->name('search');
 
     Route::get('/explore', function () {
-        return Inertia::render('Animation/Explore');
+        return Inertia::render(
+            'Animation/Explore',
+            ['ownedAnimations' => OwnedAnimations::where('user_id', auth()->id())->get('animation_id')->toArray()]
+        );
     })->name('explore');
 
     Route::get('/welcome', function () {
@@ -50,7 +54,7 @@ Route::middleware('auth')->group(function () {
     })->name('about');
 
 
-    Route::get('/forum', function (){
+    Route::get('/forum', function () {
         return Inertia::render('Animation/Forum');
     })->name('forum');
 
@@ -60,7 +64,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/api/animations/search', [AnimationSearchController::class, 'index'])->name('animations.search');
 
-    Route::get('/api/animations/purchase/{id}', [AnimationsController::class,'purchase'])->name('animation.purchase');
+    Route::get('/api/animations/purchase/{id}', [AnimationsController::class, 'purchase'])->name('animation.purchase');
 
 
 
@@ -72,4 +76,4 @@ Route::middleware('auth')->group(function () {
     Route::post('/animations/{id}/views', [AnimationsController::class, 'incrementViews'])->name('animations.increment-views');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

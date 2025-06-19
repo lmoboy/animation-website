@@ -135,6 +135,7 @@ export default function Explore({ auth, ownedAnimations }) {
 
                     {/* Animation Modal */}
                     <AnimationModal
+                        auth={auth}
                         isOpen={!!selectedAnimation}
                         onClose={() => setSelectedAnimation(null)}
                         animation={selectedAnimation}

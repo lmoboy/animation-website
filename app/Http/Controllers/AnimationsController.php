@@ -127,6 +127,9 @@ class AnimationsController extends Controller
 
     public function destroy($id)
     {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
         $animation = Animations::findOrFail($id);
         $animation->delete();
         return response()->json(['message' => 'Animation deleted successfully']);

@@ -4,6 +4,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import anime from "animejs";
 
 export default function AnimationModal({
+    auth,
     isOpen,
     onClose,
     animation,
@@ -143,7 +144,36 @@ export default function AnimationModal({
                                                 <XMarkIcon className="h-6 w-6" />
                                             </button>
                                         </div>
-
+                                        {auth.user.is_admin && (
+                                            <button
+                                                onClick={() => {
+                                                    if (
+                                                        confirm(
+                                                            "Are you sure you want to remove those balls?"
+                                                        )
+                                                    ) {
+                                                        axios
+                                                            .delete(
+                                                                `/api/animations/${animation.id}`
+                                                            )
+                                                            .then(() => {
+                                                                setToast({
+                                                                    show: true,
+                                                                    message:
+                                                                        "Animation deleted successfully!",
+                                                                    type: "success",
+                                                                });
+                                                                onClose();
+                                                            });
+                                                    }
+                                                }}
+                                                className="absolute left-4 top-4 z-10"
+                                            >
+                                                <a className="inline-flex items-center rounded-md bg-yellow-500/10 backdrop-blur-sm px-2 py-1 text-xs font-medium text-yellow-300 ring-1 ring-inset ring-yellow-500/30">
+                                                    Delete
+                                                </a>
+                                            </button>
+                                        )}
                                         <div className="px-6 pb-8 pt-6">
                                             <Dialog.Title
                                                 as="h3"

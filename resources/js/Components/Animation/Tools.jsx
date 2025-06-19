@@ -28,28 +28,40 @@ export default function Tools({
 
     const renderSettingInput = (setting) => {
         switch (setting.type) {
-            case 'select':
+            case "select":
                 return (
                     <select
                         value={toolSettings[setting.name] ?? setting.default}
-                        onChange={(e) => handleSettingChange(setting, e.target.value)}
+                        onChange={(e) =>
+                            handleSettingChange(setting, e.target.value)
+                        }
                         className="w-full bg-gray-800 text-gray-300 rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:border-purple-500"
                     >
-                        {setting.options.map(option => (
-                            typeof option === 'object' ? 
-                                <option key={option.value} value={option.value}>{option.label}</option> :
-                                <option key={option} value={option}>{option}</option>
-                        ))}
+                        {setting.options.map((option) =>
+                            typeof option === "object" ? (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ) : (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            )
+                        )}
                     </select>
                 );
 
-            case 'toggle':
+            case "toggle":
                 return (
                     <label className="relative inline-flex items-center cursor-pointer">
                         <input
                             type="checkbox"
-                            checked={toolSettings[setting.name] ?? setting.default}
-                            onChange={(e) => handleSettingChange(setting, e.target.checked)}
+                            checked={
+                                toolSettings[setting.name] ?? setting.default
+                            }
+                            onChange={(e) =>
+                                handleSettingChange(setting, e.target.checked)
+                            }
                             className="sr-only peer"
                         />
                         <div className="w-11 h-6 bg-gray-700 rounded-full peer-checked:bg-purple-500 peer-focus:ring-2 peer-focus:ring-purple-800 transition-colors">
@@ -58,38 +70,47 @@ export default function Tools({
                     </label>
                 );
 
-            case 'color':
+            case "color":
                 return (
                     <input
                         type="color"
                         value={toolSettings[setting.name] ?? setting.default}
-                        onChange={(e) => handleSettingChange(setting, e.target.value)}
+                        onChange={(e) =>
+                            handleSettingChange(setting, e.target.value)
+                        }
                         className="w-full h-10 bg-gray-800 rounded-lg cursor-pointer"
                     />
                 );
 
-            case 'bezier':
+            case "bezier":
                 return (
                     <BezierEditor
                         value={toolSettings[setting.name] ?? setting.default}
-                        onChange={(value) => handleSettingChange(setting, value)}
+                        onChange={(value) =>
+                            handleSettingChange(setting, value)
+                        }
                     />
                 );
 
-            case 'code':
+            case "code":
                 return (
                     <CodeEditor
                         language={setting.language}
-                        value={toolSettings[setting.name] ?? ''}
-                        onChange={(value) => handleSettingChange(setting, value)}
+                        value={toolSettings[setting.name] ?? ""}
+                        onChange={(value) =>
+                            handleSettingChange(setting, value)
+                        }
                     />
                 );
 
-            case 'group':
+            case "group":
                 return (
                     <div className="ml-4 space-y-4 border-l-2 border-gray-800 pl-4">
-                        {setting.settings.map(nestedSetting => (
-                            <div key={nestedSetting.name} className="tool-setting opacity-0">
+                        {setting.settings.map((nestedSetting) => (
+                            <div
+                                key={nestedSetting.name}
+                                className="tool-setting opacity-0"
+                            >
                                 {renderSettingLabel(nestedSetting)}
                                 {renderSettingInput(nestedSetting)}
                             </div>
@@ -97,15 +118,20 @@ export default function Tools({
                     </div>
                 );
 
-            case 'grid':
+            case "grid":
                 return (
                     <div className="flex gap-2">
                         <input
                             type="number"
                             min="1"
                             max="10"
-                            value={toolSettings[setting.name]?.[0] ?? setting.default[0]}
-                            onChange={(e) => handleGridChange(setting, 0, e.target.value)}
+                            value={
+                                toolSettings[setting.name]?.[0] ??
+                                setting.default[0]
+                            }
+                            onChange={(e) =>
+                                handleGridChange(setting, 0, e.target.value)
+                            }
                             className="w-16 bg-gray-800 text-gray-300 rounded-lg px-2 py-1 border border-gray-700"
                         />
                         <span className="text-gray-400 self-center">×</span>
@@ -113,8 +139,13 @@ export default function Tools({
                             type="number"
                             min="1"
                             max="10"
-                            value={toolSettings[setting.name]?.[1] ?? setting.default[1]}
-                            onChange={(e) => handleGridChange(setting, 1, e.target.value)}
+                            value={
+                                toolSettings[setting.name]?.[1] ??
+                                setting.default[1]
+                            }
+                            onChange={(e) =>
+                                handleGridChange(setting, 1, e.target.value)
+                            }
                             className="w-16 bg-gray-800 text-gray-300 rounded-lg px-2 py-1 border border-gray-700"
                         />
                     </div>
@@ -127,7 +158,12 @@ export default function Tools({
                             <div
                                 className="absolute h-2 bg-purple-500 rounded-full"
                                 style={{
-                                    width: `${((toolSettings[setting.name] - setting.min) / (setting.max - setting.min)) * 100}%`,
+                                    width: `${
+                                        ((toolSettings[setting.name] -
+                                            setting.min) /
+                                            (setting.max - setting.min)) *
+                                        100
+                                    }%`,
                                 }}
                             />
                         </div>
@@ -136,8 +172,15 @@ export default function Tools({
                             min={setting.min}
                             max={setting.max}
                             step={setting.step || 1}
-                            value={toolSettings[setting.name] ?? setting.default}
-                            onChange={(e) => handleSettingChange(setting, parseFloat(e.target.value))}
+                            value={
+                                toolSettings[setting.name] ?? setting.default
+                            }
+                            onChange={(e) =>
+                                handleSettingChange(
+                                    setting,
+                                    parseFloat(e.target.value)
+                                )
+                            }
                             className="absolute inset-0 w-full h-2 opacity-0 cursor-pointer"
                         />
                     </div>
@@ -148,7 +191,7 @@ export default function Tools({
     const handleSettingChange = (setting, value) => {
         onSettingsChange({
             ...toolSettings,
-            [setting.name]: value
+            [setting.name]: value,
         });
     };
 
@@ -157,7 +200,7 @@ export default function Tools({
         newValue[index] = parseInt(value);
         onSettingsChange({
             ...toolSettings,
-            [setting.name]: newValue
+            [setting.name]: newValue,
         });
     };
 
@@ -171,8 +214,8 @@ export default function Tools({
     );
 
     return (
-        <div className="w-64 bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-800 p-4">
-            <h2 className="text-xl font-semibold text-purple-300 mb-4">
+        <div className="w-full sm:w-64 bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-800 p-4 overflow-y-auto max-h-[400px] sm:max-h-none">
+            <h2 className="text-lg sm:text-xl font-semibold text-purple-300 mb-4">
                 Animation Tools
             </h2>
 

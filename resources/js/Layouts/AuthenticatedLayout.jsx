@@ -9,6 +9,7 @@ export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
+    console.log("Authenticated Layout Rendered", user);
     return (
         <div className="min-h-screen bg-black">
             {/* Background Elements */}
@@ -61,6 +62,15 @@ export default function Authenticated({ user, header, children }) {
                                 >
                                     Create
                                 </NavLink>
+                                {user.is_admin && (
+                                    <NavLink
+                                        href={route("admin.manage")}
+                                        active={route().current("admin.manage")}
+                                        className="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none text-gray-300 hover:text-white"
+                                    >
+                                        Admin Manage
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 
@@ -113,7 +123,7 @@ export default function Authenticated({ user, header, children }) {
                                 </Dropdown>
                             </div>
                         </div>
-                        
+
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
                                 onClick={() =>
@@ -195,7 +205,7 @@ export default function Authenticated({ user, header, children }) {
                                 {user.email}
                             </div>
                         </div>
-                        
+
                         <div className="mt-3 space-y-1">
                             <ResponsiveNavLink
                                 href={route("profile.edit")}

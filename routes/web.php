@@ -3,6 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AnimationsController;
 use App\Http\Controllers\Api\AnimationSearchController;
+use App\Http\Controllers\AdminController;
+use App\Http\Middleware\IsAdmin;
+use App\Models\User;
 use App\Models\OwnedAnimations;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +77,20 @@ Route::middleware('auth')->group(function () {
     Route::put('/animations/{id}', [AnimationsController::class, 'update'])->name('animations.update');
     Route::delete('/animations/{id}', [AnimationsController::class, 'destroy'])->name('animations.destroy');
     Route::post('/animations/{id}/views', [AnimationsController::class, 'incrementViews'])->name('animations.increment-views');
+
+    Route::middleware(IsAdmin::class)->group(function () {
+
+        Route::get('/admin/manage-users', function () {
+            return Inertia::render('Admin/ManageUsers');
+        })->name('admin.manage');
+        Route::get('/api/users', function () {
+            return User::all();
+        })->name('admin.users');
+
+        Route::delete('/api/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.deleteUser');
+        Route::delete('/api/animations/{id}', [AdminController::class, 'deleteAnimation'])->name('admin.deleteAnimation');
+    });
+
 });
 
 require __DIR__ . '/auth.php';
